@@ -74,14 +74,6 @@ class test_logic(unittest.TestCase):
         self.assertRaises(AssertionError, dmux, 2, 1)
         self.assertRaises(AssertionError, dmux, 4, 5)
 
-    def test_ormultiway(self):
-        "Checks that the output is correct"
-        self.assertTrue(ormultiway(8))
-        self.assertTrue(ormultiway('0b1000'))
-        self.assertTrue(ormultiway('-0b1'))
-        self.assertFalse(ormultiway(0))
-        self.assertFalse(ormultiway('0b0'))
-
     def test_and16(self):
         "Checks that and16(a, b) calculates 'and' bitwise and returns the correct 16-bit number"
         self.assertEquals(and16(8, 0), '0b0000000000000000')
@@ -101,7 +93,16 @@ class test_logic(unittest.TestCase):
         self.assertEquals(or16(8, 0), '0b0000000000001000')
         self.assertEquals(or16('0b0000000000001000', -1), '-0b0000000000000001')
         self.assertEquals(or16(2, 1), '0b0000000000000011')
-        self.assertEquals(or16('0b0011', '-0b0100'), '-0b0000000000000001')        
+        self.assertEquals(or16('0b0011', '-0b0100'), '-0b0000000000000001')  
+
+        
+    def test_ormultiway(self):
+        "Checks that the output is correct"
+        self.assertTrue(ormultiway(8))
+        self.assertTrue(ormultiway('0b1000'))
+        self.assertTrue(ormultiway('-0b1'))
+        self.assertFalse(ormultiway(0))
+        self.assertFalse(ormultiway('0b0'))      
 
 
 

@@ -27,6 +27,8 @@ def num_to_right_bits(num, bits):
 
 
 ### Logic gates
+
+# Chapter 1
 def nand(a, b):
     "Returns not(a and b)"
     assert (test_bit_input(a, 1) and test_bit_input(b, 1))
@@ -64,16 +66,12 @@ def or16(a, b):
     out = a | b
     return num_to_right_bits(out, 16)
 
-def ormultiway(input):
-    "Returns True if any bits in the input are 1, else returns False"
-    binput = num_to_bin(input)
-    if binput.startswith('-'):
-        binput = binput[3:]
-    else:
-        binput = binput[2:]
+def ormultiway(a):
+    "Returns True if any bits in a are 1, else returns False"
+    a = int(num_to_bin(a), 2)
+    if a == 0:
+        return False
+    return True
 
-    for bit in binput:
-        if int(bit) == 1:
-            return True
-    return False
+
 
