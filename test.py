@@ -5,8 +5,14 @@ from logic2 import *
 
 zero = Bit(0)
 one = Bit(1)
-
 nand = Bit.nand
+
+m_fifteen = Multi([one, one, one, one])
+m_eight = Multi([one, zero, zero, zero])
+m_zero = Multi([zero, zero, zero, zero])
+m_one = Multi([zero, zero, zero, one])
+m_n_one = Multi([zero, zero, zero, one], neg=True)
+m_n_two = Multi([zero, zero, one, zero], neg=True)
 
 class TestLogic(unittest.TestCase):
 
@@ -45,29 +51,43 @@ class TestLogic(unittest.TestCase):
 
     def test_mux(self):
         "Defines a truth table for mux"
-        self.assertFalse(mux(zero, zero, zero))
-        self.assertFalse(mux(zero, zero, one))
-        self.assertFalse(mux(zero, one, zero))
-        self.assertTrue(mux(zero, one, one))
-        self.assertTrue(mux(one, zero, zero))
-        self.assertFalse(mux(one, zero, one))
-        self.assertTrue(mux(one, one, zero))
-        self.assertTrue(mux(one, one, one))
+        self.assertFalse(Bit.mux(zero, zero, zero))
+        self.assertFalse(Bit.mux(zero, zero, one))
+        self.assertFalse(Bit.mux(zero, one, zero))
+        self.assertTrue(Bit.mux(zero, one, one))
+        self.assertTrue(Bit.mux(one, zero, zero))
+        self.assertFalse(Bit.mux(one, zero, one))
+        self.assertTrue(Bit.mux(one, one, zero))
+        self.assertTrue(Bit.mux(one, one, one))
 
     def test_dmux(self):
         "Defines a truth table for dmux"
-        a, b = dmux(zero, zero)
+        a, b = Bit.dmux(zero, zero)
         self.assertFalse(a)
         self.assertFalse(b)
-        a, b = dmux(zero, one)
+        a, b = Bit.dmux(zero, one)
         self.assertFalse(a)
         self.assertFalse(b)
-        a, b = dmux(one, zero)
+        a, b = Bit.dmux(one, zero)
         self.assertTrue(a)
         self.assertFalse(b)
-        a, b = dmux(one, one)
+        a, b = Bit.dmux(one, one)
         self.assertFalse(a)
         self.assertTrue(b)
+
+    def test_Multi_binary(self):
+        """Checks that the binary() function returns what it should
+            PROBLEM -- Multi[zero, zero] -> '0b00', whereas bin(0) -> '0b0'"""
+        self.assertEquals(m_eight.binary(), '0b1000')
+        self.assertEquals(m_zero.binary(), '0b0000')
+        self.assertEquals(m_n_one.binary(), '-0b0001')
+        self.assertEquals(m_n_two.binary(), '-0b0010')
+
+    def test_Multi_and(self):
+        print (m_eight & m_zero)
+        print (m_eight & m_one)
+        print (m_eight & m_n_one)
+        print (m_eight & m_fifteen)
 
 
 if __name__ == "__main__":
