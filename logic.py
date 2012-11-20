@@ -1,128 +1,105 @@
-class Logic:    
-
-    ### Test or helper functions
-    def test_bit_input(self, num, bit_len):
-        "Returns true if the number matches its required bit length"
-        if (num == 0 or num == 1) and bit_len != 1:
-            return False
-        if num > 0 and num.bit_length() != bit_len:
-            return False
-        return True
-
-    # def num_to_bin(self, num):
-    #     "Returns the binary representation of a number (8 -> '0b1000' or '0b1' -> '0b1')"
-    #     if 'b' in str(num):
-    #         return str(num)
-    #     else:
-    #         return bin(num)
-
-    # def num_to_right_bits(self, num, bits):
-    #     "Given a number, returns that number as the length of bits specified (2, 4 -> '0b0010')"
-    #     num = num_to_bin(num)
-    #     first = num[:num.index('b') + 1]
-    #     last = num[num.index('b') + 1:]
-    #     bits_to_add = bits - len(last)
-
-    #     for i in range(bits_to_add):
-    #         last = '0' + last
-    #     return first + last
+# To-do:
+### 1. Figure out how to represent negative binary values
+###    - pos and neg subclass of Multi?
 
 
-    ### Logic gates
+class Bit:
+    """A single-bit class, where bit = 0 or 1
+    Operators are overloaded and defined in terms of nand"""
 
-    # Chapter 1
-    def nand(self, a, b):
-        "Returns not(a and b)"
-        assert (self.test_bit_input(a, 1) and self.test_bit_input(b, 1))
+    def __init__(self, value):
+        "Initialise Bit with a value or either 1 or 0"
+        assert value in [0, 1], "Bit must be either a 1 or 0!"
+        self.value = int(value)
 
-        return not(a and b)
+    def __str__(self):
+        return str(self.value)
+
+    def __nonzero__(self):
+        "Enables truth comparison of Bit instances"
+        return self.value
+
+    @staticmethod
+    def nand(num1, num2):
+        """nand = not(a and b)
+        Defined as a static method because belongs logically within Bit, but syntaxtically outside it"""
+        return Bit(not(num1.value and num2.value))
+
+    def __and__(self, num1):
+        "Overloads the & operator using the nand function"
+        a = Bit.nand(self, num1)
+        return Bit.nand(a, a)
 
     def __invert__(self):
-        "Returns not(a) -- DIFFERENT than the original invert, which worked bitwise"
-        return 2
+        "Overloads ~ to return logical not of a bit, instead of bitwise not"
+        return Bit.nand(self, self)
 
-    def test_invert(self):
-        print "not 0 ==", ~0
-        print "not 1 ==", ~1
+    def __or__(self, num1):
+        "Overloads the | operator using the nand function"
+        return Bit.nand(~self, ~num1)
 
+    def __xor__(self, num1):
+        "Overloads the | operator using the nand function"
+        first = ~(self & ~num1)
+        last = ~(num1 & ~self)
+        return Bit.nand(first, last)
 
+    @staticmethod
+    def mux(a, b, sel):
+        "If sel = 0, returns a; if sel = 1, returns b"
+        return (a & ~sel | (b & sel))  
 
-x = Logic()
-x.test_invert()
+    @staticmethod
+    def dmux(a, sel):
+        "If sel = 0, returns (a=input, b=0); if sel = 1, returns (a=0, b=input)"
+        return ((a & ~sel), (a & sel))
 
+class Multi:
+    "PROBLEM -- negative Multibit values are not handled properly"
+    
+    def __init__(self, bit_list, neg=False):
+        "Multi is a list of Bits, with an optional parameter for a negative value"
+        self.value = [bit for bit in bit_list]
+        self.neg = neg
 
-    # New functions, in terms of nand
+    def __len__(self):
+        return len(self.value)
 
-    # def __and__(self, a, b):
-    #     "Overloads the & operator, defined in terms of nand"
-    #     c = self.nand(a, b)
-    #     return self.nand(c, c)
-    # 
-    # def __or__(self, a, b):
-    #     "Overloads the | operator, defined in terms of nand"
-    #     return self.nand(~a, ~b)
-    # 
-    # def __xor__(self, a, b):
-    #     "Overloads the ^ operator, defined in terms of nand"
-    #     x = ~(a & (~b))
-    #     y = ~(b & (~a))
-    #     return self.nand(x, y)
-    # 
-    # def mux(self, a, b, sel):
-    #     "If sel = 0, returns a; if sel = 1, returns b"
-    #     assert (self.test_bit_input(a, 1) and self.test_bit_input(b, 1) and self.test_bit_input(sel, 1))
-    # 
-    #     return (a & ~sel | (b & sel))  
-    # 
-    # def dmux(self, a, sel):
-    #     "If sel = 0, returns (a=input, b=0); if sel = 1, returns (a=0, b=input)"
-    #     assert (self.test_bit_input(a, 1) and self.test_bit_input(sel, 1))
-    # 
-    #     x, y = (a & ~sel, (a & sel))
-    #     return (x, y)
+    def __str__(self):
+        return self.binary()
 
+    def radix(self):
+        if self.neg:
+            n = len(self)
+            print n
+            radix = 2**n - int(self.binary()[1:], 2)
+            print radix
+            return [Bit(int(digit)) for digit in bin(radix)[2:]]
 
+    def binary(self):
+        "Turns a list of bits into a python binary representation (e.g. '0b1000')"
+        bin_str = ''.join([str(digit) for digit in self.value])
+        bin_str = '0b' + bin_str
+        if self.neg:
+            bin_str = '-' + bin_str
+        return bin_str 
 
+    @staticmethod
+    def from_num(num):
+        "Enables construction of a Multi instance using a number or binary number"
+        try:
+            bnum = bin(num)
+        except TypeError:
+            bnum = num
+        b = bnum.index('b') + 1
 
-    # Functions defined pythonically
+        if bnum.startswith('-'): 
+            neg = True
+        else:
+            neg = False
+        return Multi([Bit(int(digit)) for digit in bnum[b:]], neg=neg)
+ 
+    def __and__(self, mult):
+        assert len(self) == len(mult), "List lengths do not match: {0} and {1}".format(len(self), len(mult))
 
-    # def mux(a, b, sel):
-    #     "If sel = 0, returns a; if sel = 1, returns b"
-    #     assert (test_bit_input(a, 1) and test_bit_input(b, 1) and test_bit_input(sel, 1))
-
-    #     return (a and not sel) or (b and sel)
-
-    # def dmux(input, sel):
-    #     "if sel = 0, returns (a=input, b=0); if sel = 1, returns (a=0, b=input)"
-    #     assert (test_bit_input(input, 1) and test_bit_input(sel, 1))
-
-    #     x, y = (input and not sel), (input and sel)
-    #     return (x, y)
-
-    # def and16(a, b):
-    #     "Returns a 16-bit number where out[0] = (a[0] and b[0]), etc.."
-    #     a, b = int(num_to_bin(a), 2), int(num_to_bin(b), 2)
-    #     out = a & b
-    #     return num_to_right_bits(out, 16)
-
-    # def not16(a):
-    #     "Returns a 16-bit number where out[0] = not a[0]"
-    #     a = num_to_bin(a)
-    #     out = ~int(a, 2)
-    #     return num_to_right_bits(out, 16)
-
-    # def or16(a, b):
-    #     "Returns a 16-bit number where out[0] = (a[0] or b[0]), etc.."
-    #     a, b = int(num_to_bin(a), 2), int(num_to_bin(b), 2)
-    #     out = a | b
-    #     return num_to_right_bits(out, 16)
-
-    # def ormultiway(a):
-    #     "Returns True if any bits in a are 1, else returns False"
-    #     a = int(num_to_bin(a), 2)
-    #     if a == 0:
-    #         return False
-    #     return True
-
-
-
+        return Multi([(pair[0] & pair[1]) for pair in zip(self.value, mult.value)])

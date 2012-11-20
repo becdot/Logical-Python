@@ -7,12 +7,12 @@ zero = Bit(0)
 one = Bit(1)
 nand = Bit.nand
 
-m_fifteen = Multi([one, one, one, one])
 m_eight = Multi([one, zero, zero, zero])
+m_three = Multi([zero, zero, one, one])
 m_zero = Multi([zero, zero, zero, zero])
 m_one = Multi([zero, zero, zero, one])
-m_n_one = Multi([zero, zero, zero, one], neg=True)
-m_n_two = Multi([zero, zero, one, zero], neg=True)
+m_n_one = Multi([one, one, one, one], neg=True)
+m_n_two = Multi([one, one, one, zero], neg=True)
 
 class TestLogic(unittest.TestCase):
 
@@ -80,14 +80,18 @@ class TestLogic(unittest.TestCase):
             PROBLEM -- Multi[zero, zero] -> '0b00', whereas bin(0) -> '0b0'"""
         self.assertEquals(m_eight.binary(), '0b1000')
         self.assertEquals(m_zero.binary(), '0b0000')
-        self.assertEquals(m_n_one.binary(), '-0b0001')
-        self.assertEquals(m_n_two.binary(), '-0b0010')
+        self.assertEquals(m_n_one.binary(), '-0b1111')
+        self.assertEquals(m_n_two.binary(), '-0b1110')
 
     def test_Multi_and(self):
-        print (m_eight & m_zero)
-        print (m_eight & m_one)
-        print (m_eight & m_n_one)
-        print (m_eight & m_fifteen)
+        self.assertEquals(str(m_eight & m_zero), str(m_zero))
+        self.assertEquals(str(m_eight & m_one), str(m_zero))
+        self.assertEquals(str(m_eight & m_n_one), str(m_eight))
+        self.assertEquals(str(m_three & m_n_two), str(Multi([zero, zero, one, zero])))
+
+    def test_radix(self):
+        print m_n_one.radix()
+        print m_n_two.radix()
 
 
 if __name__ == "__main__":
