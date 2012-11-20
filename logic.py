@@ -37,48 +37,54 @@ class Logic:
 
         return not(a and b)
 
-    def nott(self, a):
-        "Returns not(a)"
-        return self.nand(a, a)
+    def __invert__(self):
+        "Returns not(a) -- DIFFERENT than the original invert, which worked bitwise"
+        return 2
 
-    def __and__(self, a, b):
-        "Overloads the & operator, defined in terms of nand"
-        c = self.nand(a, b)
-        return self.nand(c, c)
-
-    def __or__(self, a, b):
-        "Overloads the | operator, defined in terms of nand"
-        x = self.nand(a, a)
-        y = self.nand(b, b)
-        return self.nand(x, y)
-
-    def __xor__(self, a, b):
-        "Overloads the ^ operator, defined in terms of nand"
-        notb = self.nand(b, b)
-        nota = self.nand(a, a)
-        a_and_notb = self.nand(self.nand(a, notb), self.nand(a, notb))
-        b_and_nota = self.nand(self.nand(b, nota), self.nand(b, nota))
-        not_aandnotb = self.nand(a_and_notb, a_and_notb)
-        not_bandnota = self.nand(b_and_nota, b_and_nota)
-        return self.nand(not_aandnotb, not_bandnota)
-
-    def mux(self, a, b, sel):
-        "If sel = 0, returns a; if sel = 1, returns b"
-        assert (self.test_bit_input(a, 1) and self.test_bit_input(b, 1) and self.test_bit_input(sel, 1))
-
-        return (a & self.nott(sel) | (b & sel))  
-
-    def dmux(self, a, sel):
-        "If sel = 0, returns (a=input, b=0); if sel = 1, returns (a=0, b=input)"
-        assert (self.test_bit_input(a, 1) and self.test_bit_input(sel, 1))
-
-        x, y = (a & self.nott(sel), (a & sel))
-        return (x, y)
+    def test_invert(self):
+        print "not 0 ==", ~0
+        print "not 1 ==", ~1
 
 
 
+x = Logic()
+x.test_invert()
 
 
+    # New functions, in terms of nand
+
+    # def __and__(self, a, b):
+    #     "Overloads the & operator, defined in terms of nand"
+    #     c = self.nand(a, b)
+    #     return self.nand(c, c)
+    # 
+    # def __or__(self, a, b):
+    #     "Overloads the | operator, defined in terms of nand"
+    #     return self.nand(~a, ~b)
+    # 
+    # def __xor__(self, a, b):
+    #     "Overloads the ^ operator, defined in terms of nand"
+    #     x = ~(a & (~b))
+    #     y = ~(b & (~a))
+    #     return self.nand(x, y)
+    # 
+    # def mux(self, a, b, sel):
+    #     "If sel = 0, returns a; if sel = 1, returns b"
+    #     assert (self.test_bit_input(a, 1) and self.test_bit_input(b, 1) and self.test_bit_input(sel, 1))
+    # 
+    #     return (a & ~sel | (b & sel))  
+    # 
+    # def dmux(self, a, sel):
+    #     "If sel = 0, returns (a=input, b=0); if sel = 1, returns (a=0, b=input)"
+    #     assert (self.test_bit_input(a, 1) and self.test_bit_input(sel, 1))
+    # 
+    #     x, y = (a & ~sel, (a & sel))
+    #     return (x, y)
+
+
+
+
+    # Functions defined pythonically
 
     # def mux(a, b, sel):
     #     "If sel = 0, returns a; if sel = 1, returns b"
