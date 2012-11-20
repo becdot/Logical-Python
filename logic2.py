@@ -9,6 +9,11 @@ class Bit:
     def __str__(self):
         return str(self.value)
 
+    def __nonzero__(self):
+        if self.value:
+            return True
+        return False
+
     @staticmethod
     def nand(num1, num2):
         return Bit(not(num1.value and num2.value))
