@@ -15,6 +15,9 @@ class Bit:
     def __str__(self):
         return str(self.value)
 
+    def __mul__(self, other):
+        return int(self.value * other)
+
     def __nonzero__(self):
         "Enables truth comparison of Bit instances"
         return self.value
@@ -55,34 +58,27 @@ class Bit:
         return ((a & ~sel), (a & sel))
 
 class Multi:
-    "PROBLEM -- negative Multibit values are not handled properly"
+    "TODO -- negative Multibit values are not handled properly"
     
-    def __init__(self, bit_list, neg=False):
+    def __init__(self, bit_list):
         "Multi is a list of Bits, with an optional parameter for a negative value"
         self.value = [bit for bit in bit_list]
-        self.neg = neg
 
     def __len__(self):
         return len(self.value)
 
     def __str__(self):
-        return self.binary()
+        return ''.join(str(bit) for bit in self.value)
 
-    def radix(self):
-        if self.neg:
-            n = len(self)
-            print n
-            radix = 2**n - int(self.binary()[1:], 2)
-            print radix
-            return [Bit(int(digit)) for digit in bin(radix)[2:]]
+    def __iter__(self):
+        for bit in self.value:
+            yield bit
 
-    def binary(self):
-        "Turns a list of bits into a python binary representation (e.g. '0b1000')"
-        bin_str = ''.join([str(digit) for digit in self.value])
-        bin_str = '0b' + bin_str
-        if self.neg:
-            bin_str = '-' + bin_str
-        return bin_str 
+    def to_decimel(self):
+        sum = 0
+        for i, bit in enumerate(reversed(self.value)):
+            sum += (bit * 2**i)
+        return sum
 
     @staticmethod
     def from_num(num):
@@ -93,13 +89,46 @@ class Multi:
             bnum = num
         b = bnum.index('b') + 1
 
-        if bnum.startswith('-'): 
-            neg = True
-        else:
-            neg = False
-        return Multi([Bit(int(digit)) for digit in bnum[b:]], neg=neg)
+        return Multi([Bit(int(digit)) for digit in bnum[b:]])
+
+    def pad_multi(self, m1):
+        "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
+        "TODO - Modify this so that it does not change the underlying values"
+        if not (len(self) - len(m1)):
+            return (self, m1)
+        longest = max(self, m1, key=len)
+        shortest = min(self, m1, key=len)
+        diff = len(longest) - len(shortest)
+        for i in range(diff):
+            shortest.value.insert(0, Bit(0))
+        assert len(longest) == len(shortest)
+        return (longest, shortest)
  
     def __and__(self, mult):
-        assert len(self) == len(mult), "List lengths do not match: {0} and {1}".format(len(self), len(mult))
+        "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
+        m1, m2 = self.pad_multi(mult)
+        return Multi([(pair[0] & pair[1]) for pair in zip(m1.value, m2.value)])
 
-        return Multi([(pair[0] & pair[1]) for pair in zip(self.value, mult.value)])
+    def __invert__(self):
+        "Overloads the ~ operator so that out[0] = ~in[0], out[1] = ~in[1] etc..."
+        return Multi([~bit for bit in self.value])
+
+    def __or__(self, mult):
+        "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
+        m1, m2 = self.pad_multi(mult)
+        return Multi([(pair[0] | pair[1]) for pair in zip(m1.value, m2.value)])
+
+    @staticmethod
+    def multimux(m1, m2, sel):
+        "Takes two Multi instances and return m1 if sel = 0 and m2 if sel = 1"
+        a, b = Multi.pad_multi(m1, m2)
+        return Multi([((pair[0] & ~sel) | (pair[1] & sel)) for pair in zip(a.value, b.value)])
+
+    @staticmethod
+    def multior_multiway(m1):
+        "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
+        base = Bit(0)
+        for bit in m1:
+            base = base | bit
+        return base
+

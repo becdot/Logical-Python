@@ -1,18 +1,19 @@
 import unittest
 
-from logic2 import *
+from logic import *
 
 
 zero = Bit(0)
 one = Bit(1)
 nand = Bit.nand
 
+m_fifteen = Multi([one, one, one, one])
+m_fourteen = Multi([one, one, one, zero])
 m_eight = Multi([one, zero, zero, zero])
-m_three = Multi([zero, zero, one, one])
-m_zero = Multi([zero, zero, zero, zero])
-m_one = Multi([zero, zero, zero, one])
-m_n_one = Multi([one, one, one, one], neg=True)
-m_n_two = Multi([one, one, one, zero], neg=True)
+m_three = Multi([one, one])
+m_one = Multi([zero, zero, one])
+m_zero = Multi([zero])
+
 
 class TestLogic(unittest.TestCase):
 
@@ -75,23 +76,94 @@ class TestLogic(unittest.TestCase):
         self.assertFalse(a)
         self.assertTrue(b)
 
-    def test_Multi_binary(self):
-        """Checks that the binary() function returns what it should
-            PROBLEM -- Multi[zero, zero] -> '0b00', whereas bin(0) -> '0b0'"""
-        self.assertEquals(m_eight.binary(), '0b1000')
-        self.assertEquals(m_zero.binary(), '0b0000')
-        self.assertEquals(m_n_one.binary(), '-0b1111')
-        self.assertEquals(m_n_two.binary(), '-0b1110')
+    def test_Multi_to_decimel(self):
+        "Binary -> decimel"
+        "TODO -- check against negative numbers"
+        self.assertEquals(Multi.to_decimel(m_fifteen), 15)
+        self.assertEquals(Multi.to_decimel(m_eight), 8)
+        self.assertEquals(Multi.to_decimel(m_one), 1)
+        self.assertEquals(Multi.to_decimel(m_zero), 0)
+
 
     def test_Multi_and(self):
+        "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"
+        "TODO - pad_multi changes the underlying Multi arrays, needs fixing"
+
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
         self.assertEquals(str(m_eight & m_zero), str(m_zero))
         self.assertEquals(str(m_eight & m_one), str(m_zero))
-        self.assertEquals(str(m_eight & m_n_one), str(m_eight))
-        self.assertEquals(str(m_three & m_n_two), str(Multi([zero, zero, one, zero])))
+        self.assertEquals(str(m_eight & m_fifteen), str(m_eight))
+        self.assertEquals(str(m_three & m_fourteen), str(Multi([zero, zero, one, zero])))
+        self.assertEquals(str(m_one & m_three), str(m_one))
 
-    def test_radix(self):
-        print m_n_one.radix()
-        print m_n_two.radix()
+    def test_Multi_not(self):
+        "Checks that the multibit ~ flips all the signs of a Multi array"
+        "TODO - Once pad_multi is fixed to not modify underlying Multi arrays, move test values outside the test function"
+
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
+        self.assertEquals(str(~m_fifteen), str(Multi([zero, zero, zero, zero])))
+        self.assertEquals(str(~m_eight), str(Multi([zero, one, one, one])))
+        self.assertEquals(str(~m_three), str(Multi([zero, zero])))
+        self.assertEquals(str(~m_one), str(Multi([one, one, zero])))
+        self.assertEquals(str(~m_zero), str(Multi([one])))
+
+    def test_Multi_or(self):
+        "Checks that multibit | returns the correct value and pads Multi arrays of different sizes appropriately"
+        "TODO - pad_multi changes the underlying Multi arrays, needs fixing"
+
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
+        self.assertEquals(str(m_eight | m_zero), str(m_eight))
+        self.assertEquals(str(m_eight | m_one), str(Multi([one, zero, zero, one])))
+        self.assertEquals(str(m_eight | m_fifteen), str(m_fifteen))
+        self.assertEquals(str(m_three | m_one), str(Multi([zero, zero, one, one])))
+        self.assertEquals(str(m_one | m_fourteen), str(m_fifteen))
+
+    def test_multimux(self):
+
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
+        self.assertEquals(str(Multi.multimux(m_eight, m_zero, zero)), str(m_eight))
+        self.assertEquals(str(Multi.multimux(m_eight, m_fifteen, one)), str(m_fifteen))
+        self.assertEquals(str(Multi.multimux(m_zero, m_one, zero)), str(m_zero))
+        self.assertEquals(str(Multi.multimux(m_zero, m_one, one)), str(m_one))
+
+    def test_multior_multiway(self):
+
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
+        self.assertTrue(str(Multi.multior_multiway(m_eight)))
+        self.assertTrue(str(Multi.multior_multiway(m_fifteen)))
+        self.assertTrue(str(Multi.multior_multiway(m_one)))
+        self.assertTrue(str(Multi.multior_multiway(m_zero)))
+
 
 
 if __name__ == "__main__":
