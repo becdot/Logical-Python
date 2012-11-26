@@ -1,3 +1,5 @@
+import math
+
 # To-do:
 ### 1. Figure out how to represent negative binary values
 ###    - pos and neg subclass of Multi?
@@ -74,6 +76,9 @@ class Multi:
         for bit in self.value:
             yield bit
 
+    def __getitem__(self, key):
+        return self.value[key]
+
     def to_decimel(self):
         sum = 0
         for i, bit in enumerate(reversed(self.value)):
@@ -120,7 +125,7 @@ class Multi:
 
     @staticmethod
     def multimux(m1, m2, sel):
-        "Takes two Multi instances and return m1 if sel = 0 and m2 if sel = 1"
+        "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
         a, b = Multi.pad_multi(m1, m2)
         return Multi([((pair[0] & ~sel) | (pair[1] & sel)) for pair in zip(a.value, b.value)])
 
@@ -129,6 +134,30 @@ class Multi:
         "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
         base = Bit(0)
         for bit in m1:
-            base = base | bit
+            base = (base | bit)
         return base
+
+    @staticmethod
+    def multimux_multiway(sel, *m_list):
+        log = int(math.log(len(m_list), 2))
+        assert len(sel) == log, "sel must be {0} bits".format(log)
+
+        def reduce_winner(winner_list, sel):
+            if len(winner_list) == 1:
+                return winner_list[0]
+            pow_two = int(math.log(len(winner_list), 2))
+            curr_sel = sel[-pow_two]
+            return reduce_winner(
+                [Multi.multimux(m1=winner_list[i], m2=winner_list[i + pow_two], sel=curr_sel) 
+                            for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)], 
+                sel)
+
+
+        return reduce_winner(m_list, sel)
+
+
+
+
+
+
 

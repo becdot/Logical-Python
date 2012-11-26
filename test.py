@@ -164,6 +164,22 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(str(Multi.multior_multiway(m_one)))
         self.assertTrue(str(Multi.multior_multiway(m_zero)))
 
+    def test_multimux_multiway(self):
+
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
+        self.assertEquals(str(Multi.multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
+        self.assertEquals(str(Multi.multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(m_one))
+        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(m_zero))
+        self.assertEquals(str(Multi.multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
+                                                      m_fifteen, m_fourteen)), str(m_eight))
+        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
+                                                      m_fifteen, m_fourteen)), str(m_fourteen))
 
 
 if __name__ == "__main__":
