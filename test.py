@@ -150,7 +150,7 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(Multi.multimux(m_zero, m_one, zero)), str(m_zero))
         self.assertEquals(str(Multi.multimux(m_zero, m_one, one)), str(m_one))
 
-    def test_multior_multiway(self):
+    def test_or_multiway(self):
 
         m_fifteen = Multi([one, one, one, one])
         m_fourteen = Multi([one, one, one, zero])
@@ -159,10 +159,10 @@ class TestLogic(unittest.TestCase):
         m_one = Multi([zero, zero, one])
         m_zero = Multi([zero])
 
-        self.assertTrue(str(Multi.multior_multiway(m_eight)))
-        self.assertTrue(str(Multi.multior_multiway(m_fifteen)))
-        self.assertTrue(str(Multi.multior_multiway(m_one)))
-        self.assertTrue(str(Multi.multior_multiway(m_zero)))
+        self.assertTrue(str(Multi.or_multiway(m_eight)))
+        self.assertTrue(str(Multi.or_multiway(m_fifteen)))
+        self.assertTrue(str(Multi.or_multiway(m_one)))
+        self.assertTrue(str(Multi.or_multiway(m_zero)))
 
     def test_multimux_multiway(self):
 
@@ -180,6 +180,29 @@ class TestLogic(unittest.TestCase):
                                                       m_fifteen, m_fourteen)), str(m_eight))
         self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
                                                       m_fifteen, m_fourteen)), str(m_fourteen))
+
+    def test_dmux_multiway(self):
+        m_fifteen = Multi([one, one, one, one])
+        m_fourteen = Multi([one, one, one, zero])
+        m_eight = Multi([one, zero, zero, zero])
+        m_three = Multi([one, one])
+        m_one = Multi([zero, zero, one])
+        m_zero = Multi([zero])
+
+        a = Multi.dmux_multiway(Multi([one]), Multi([zero]))
+        b = Multi.dmux_multiway(Multi([one]), Multi([zero, one]))
+        c = Multi.dmux_multiway(Multi([one]), Multi([one, one]))
+        d = Multi.dmux_multiway(Multi([one]), Multi([zero, one, one]))
+        self.assertEquals(Multi.dmux_multiway([str(bit) for bit in a], 
+                                                [str(Multi([one])), str(Multi([zero]))]))
+        # self.assertEquals(Multi.dmux_multiway([str(bit) for bit in b], 
+        #                                     [str(Multi([zero])), str(Multi([one])), str(Multi([zero])), str(Multi([zero]))]))
+        # self.assertEquals(Multi.dmux_multiway([str(bit) for bit in c], 
+        #                                     [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([one]))]))
+        # self.assertEquals(Multi.dmux_multiway([str(bit) for bit in d], 
+        #                                     [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([one])), 
+        #                                     str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([zero]))]))
+
 
 
 if __name__ == "__main__":

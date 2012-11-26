@@ -1,8 +1,12 @@
 import math
 
-# To-do:
+# TODO:
 ### 1. Figure out how to represent negative binary values
 ###    - pos and neg subclass of Multi?
+### 2. Take out static methods
+### 3. Modify pad_multi() so that it doesn't change the underlying Multi instances
+### 4. Have mux and dmux return Bit instances, and multi mux and dmux return Multi instances??
+### 5. Enable multidmux?
 
 
 class Bit:
@@ -11,11 +15,14 @@ class Bit:
 
     def __init__(self, value):
         "Initialise Bit with a value or either 1 or 0"
-        assert value in [0, 1], "Bit must be either a 1 or 0!"
+        assert value in [0, '0', 1, '1'], "Bit must be either a 1 or 0!"
         self.value = int(value)
 
     def __str__(self):
         return str(self.value)
+
+    def __int__(self):
+        return int(self.value)
 
     def __mul__(self, other):
         return int(self.value * other)
@@ -52,12 +59,14 @@ class Bit:
     @staticmethod
     def mux(a, b, sel):
         "If sel = 0, returns a; if sel = 1, returns b"
+        "TODO does this need to return a Bit instance?"
         return (a & ~sel | (b & sel))  
 
     @staticmethod
     def dmux(a, sel):
-        "If sel = 0, returns (a=input, b=0); if sel = 1, returns (a=0, b=input)"
-        return ((a & ~sel), (a & sel))
+        "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
+        "TODO does this need to return a Bit instance?"
+        return [(a & ~sel), (a & sel)]
 
 class Multi:
     "TODO -- negative Multibit values are not handled properly"
@@ -76,8 +85,8 @@ class Multi:
         for bit in self.value:
             yield bit
 
-    def __getitem__(self, key):
-        return self.value[key]
+    def __getitem__(self, index):
+        return self.value[index]
 
     def to_decimel(self):
         sum = 0
@@ -130,7 +139,7 @@ class Multi:
         return Multi([((pair[0] & ~sel) | (pair[1] & sel)) for pair in zip(a.value, b.value)])
 
     @staticmethod
-    def multior_multiway(m1):
+    def or_multiway(m1):
         "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
         base = Bit(0)
         for bit in m1:
@@ -139,21 +148,50 @@ class Multi:
 
     @staticmethod
     def multimux_multiway(sel, *m_list):
+        "Takes a variable number of Multi instances (must be a power of two) and returns the Multi instance indicated by the selector"
         log = int(math.log(len(m_list), 2))
         assert len(sel) == log, "sel must be {0} bits".format(log)
+        assert len(m_list) in [2**i for i in range(16)], "The list of variables must be a power of two"
 
-        def reduce_winner(winner_list, sel):
+        def reduce_winner(sel, winner_list):
             if len(winner_list) == 1:
+                print "winner!"
                 return winner_list[0]
             pow_two = int(math.log(len(winner_list), 2))
             curr_sel = sel[-pow_two]
-            return reduce_winner(
+            return reduce_winner(sel,
                 [Multi.multimux(m1=winner_list[i], m2=winner_list[i + pow_two], sel=curr_sel) 
-                            for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)], 
-                sel)
+                            for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)])
 
 
-        return reduce_winner(m_list, sel)
+        return reduce_winner(sel, m_list)
+
+    @staticmethod
+    def dmux_multiway(input, sel):
+        num_outputs = 2**len(sel)
+
+        print "sel", sel
+        print "num outputs", num_outputs
+
+        def expand_winner(winner_list, s):
+            print "winner_list =", winner_list, "s =", s
+            if len(winner_list) == num_outputs:
+                return winner_list
+            if len(winner_list) == 1:
+                winner_list = Bit.dmux(input[0], s[0])
+                print "if", winner_list
+                print [str(pair) for pair in winner_list]
+                return expand_winner(winner_list, s)
+            else:
+                log = int(math.log(len(winner_list), 2))
+                print "else", winner_list
+                print [str(pair) for pair in winner_list]
+                winner_list = [Bit.dmux(pair, s[log]) for pair in winner_list]
+                return expand_winner(winner_list, s)
+
+        return expand_winner(input, sel)
+
+
 
 
 
