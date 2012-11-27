@@ -1,7 +1,7 @@
+from bit import Bit
+from multi import Multi
+
 import unittest
-
-from logic import *
-
 
 zero = Bit(0)
 one = Bit(1)
