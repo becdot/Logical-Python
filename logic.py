@@ -83,10 +83,8 @@ class Multi:
         return self.value[index]
 
     def to_decimel(self):
-        sum = 0
-        for i, bit in enumerate(reversed(self.value)):
-            sum += (bit * 2**i)
-        return sum
+        "Converts a Multi instance to a decimel representation"
+        return sum([(bit * 2**i) for i, bit in enumerate(reversed(self.value))])
 
     def from_num(self):
         "Enables construction of a Multi instance using a number or binary number"
