@@ -4,7 +4,6 @@ import math
 ### 1. Figure out how to represent negative binary values
 ###    - pos and neg subclass of Multi?
 ### 2. Take out static methods
-### 3. Modify pad_multi() so that it doesn't change the underlying Multi instances
 ### 5. Enable multidmux (currently can only accept a one-bit input)?
 
 
@@ -14,7 +13,7 @@ class Bit:
 
     def __init__(self, value):
         "Initialise Bit with a value or either 1 or 0"
-        #assert value in [0, '0', False, 1, '1', True], "Bit must be either a 1 or 0!"
+        assert int(value) in [0, 1], "Bit must be either a 1 or 0!"
         self.value = int(value)
 
     def __str__(self):
@@ -55,15 +54,13 @@ class Bit:
         last = ~(num1 & ~self)
         return Bit.nand(first, last)
 
-    @staticmethod
-    def mux(a, b, sel):
+    def mux(self, bit, sel):
         "If sel = 0, returns a; if sel = 1, returns b"
-        return Bit(a & ~sel) | Bit(b & sel)
+        return Bit(self & ~sel) | Bit(bit & sel)
 
-    @staticmethod
-    def dmux(a, sel):
+    def dmux(self, sel):
         "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
-        return [Bit(a & ~sel), Bit(a & sel)]
+        return [Bit(self & ~sel), Bit(self & sel)]
 
 class Multi:
     "TODO -- negative Multibit values are not handled properly"
@@ -91,37 +88,34 @@ class Multi:
             sum += (bit * 2**i)
         return sum
 
-    @staticmethod
-    def from_num(num):
+    def from_num(self):
         "Enables construction of a Multi instance using a number or binary number"
         try:
-            bnum = bin(num)
+            bnum = bin(self)
         except TypeError:
-            bnum = num
+            bnum = self
         b = bnum.index('b') + 1
 
         return Multi([Bit(int(digit)) for digit in bnum[b:]])
 
-    @staticmethod
-    def pad_multi(m1, m2):
+    def pad_multi(self, mult):
         "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
-        "TODO - Modify this so that it does not change the underlying values"
-        if not (len(m1) - len(m2)):
-            return (m1, m2)
-        longest = Multi(max(m1, m2, key=len))
-        shortest = Multi(min(m1, m2, key=len))
+        if not (len(self) - len(mult)):
+            return (self, mult)
+        longest = Multi(max(self, mult, key=len))
+        shortest = Multi(min(self, mult, key=len))
         diff = len(longest) - len(shortest)
         for i in range(diff):
             shortest.value.insert(0, Bit(0))
         assert len(longest) == len(shortest)
 
-        if longest.value == m1.value:
+        if longest.value == self.value:
             return (longest, shortest)
         return (shortest, longest)
  
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
-        m1, m2 = self.pad_multi(self, mult)
+        m1, m2 = self.pad_multi(mult)
         return Multi([(pair[0] & pair[1]) for pair in zip(m1.value, m2.value)])
 
     def __invert__(self):
@@ -130,20 +124,18 @@ class Multi:
 
     def __or__(self, mult):
         "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
-        m1, m2 = self.pad_multi(self, mult)
+        m1, m2 = self.pad_multi(mult)
         return Multi([(pair[0] | pair[1]) for pair in zip(m1.value, m2.value)])
 
-    @staticmethod
-    def multimux(m1, m2, sel):
+    def multimux(self, mult, sel):
         "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
-        a, b = Multi.pad_multi(m1, m2)
-        return Multi([((pair[0] & ~sel) | (pair[1] & sel)) for pair in zip(a.value, b.value)])
+        a, b = self.pad_multi(mult)
+        return Multi([pair[0].mux(pair[1], sel) for pair in zip(a.value, b.value)])
 
-    @staticmethod
-    def or_multiway(m1):
+    def or_multiway(self):
         "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
         base = Bit(0)
-        for bit in m1:
+        for bit in self:
             base = (base | bit)
         return base
 
@@ -159,13 +151,12 @@ class Multi:
                 return winner_list[0]
             pow_two = int(math.log(len(winner_list), 2))
             curr_sel = sel[-pow_two]
-            return reduce_winner(sel, [Multi.multimux(m1=winner_list[i], m2=winner_list[i + pow_two], sel=curr_sel) 
+            return reduce_winner(sel, [winner_list[i].multimux(winner_list[i + pow_two], curr_sel) 
                                         for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)])
 
         return Multi(reduce_winner(sel, m_list))
 
-    @staticmethod
-    def dmux_multiway(a, sel):
+    def dmux_multiway(self, sel):
         "Takes an input and a selector and returns a list of Bits where the sel Bit = input, and all others Bits = 0"
         num_outputs = 2**len(sel)
 
@@ -180,5 +171,5 @@ class Multi:
             winners = [instance for sublist in winners for instance in sublist] # Collapse list
             return expand_winner(winners, s)
 
-        return expand_winner(a, sel)
+        return expand_winner(self, sel)
 
