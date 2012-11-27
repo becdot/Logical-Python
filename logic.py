@@ -5,8 +5,7 @@ import math
 ###    - pos and neg subclass of Multi?
 ### 2. Take out static methods
 ### 3. Modify pad_multi() so that it doesn't change the underlying Multi instances
-### 4. Have mux and dmux return Bit instances, and multi mux and dmux return Multi instances??
-### 5. Enable multidmux (currently can only accept a one-bit input)
+### 5. Enable multidmux (currently can only accept a one-bit input)?
 
 
 class Bit:
@@ -70,7 +69,7 @@ class Multi:
     "TODO -- negative Multibit values are not handled properly"
     
     def __init__(self, bit_list):
-        "Multi is a list of Bits, with an optional parameter for a negative value"
+        "Multi is a list of Bits"
         self.value = [bit for bit in bit_list]
 
     def __len__(self):
@@ -103,22 +102,26 @@ class Multi:
 
         return Multi([Bit(int(digit)) for digit in bnum[b:]])
 
-    def pad_multi(self, m1):
+    @staticmethod
+    def pad_multi(m1, m2):
         "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
         "TODO - Modify this so that it does not change the underlying values"
-        if not (len(self) - len(m1)):
-            return (self, m1)
-        longest = max(self, m1, key=len)
-        shortest = min(self, m1, key=len)
+        if not (len(m1) - len(m2)):
+            return (m1, m2)
+        longest = Multi(max(m1, m2, key=len))
+        shortest = Multi(min(m1, m2, key=len))
         diff = len(longest) - len(shortest)
         for i in range(diff):
             shortest.value.insert(0, Bit(0))
         assert len(longest) == len(shortest)
-        return (longest, shortest)
+
+        if longest.value == m1.value:
+            return (longest, shortest)
+        return (shortest, longest)
  
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
-        m1, m2 = self.pad_multi(mult)
+        m1, m2 = self.pad_multi(self, mult)
         return Multi([(pair[0] & pair[1]) for pair in zip(m1.value, m2.value)])
 
     def __invert__(self):
@@ -127,7 +130,7 @@ class Multi:
 
     def __or__(self, mult):
         "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
-        m1, m2 = self.pad_multi(mult)
+        m1, m2 = self.pad_multi(self, mult)
         return Multi([(pair[0] | pair[1]) for pair in zip(m1.value, m2.value)])
 
     @staticmethod
@@ -156,10 +159,8 @@ class Multi:
                 return winner_list[0]
             pow_two = int(math.log(len(winner_list), 2))
             curr_sel = sel[-pow_two]
-            return reduce_winner(sel,
-                [Multi.multimux(m1=winner_list[i], m2=winner_list[i + pow_two], sel=curr_sel) 
-                            for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)])
-
+            return reduce_winner(sel, [Multi.multimux(m1=winner_list[i], m2=winner_list[i + pow_two], sel=curr_sel) 
+                                        for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)])
 
         return Multi(reduce_winner(sel, m_list))
 
@@ -171,7 +172,6 @@ class Multi:
         def expand_winner(winner_list, s):
             if len(winner_list) == num_outputs:
                 return winner_list
-
             if len(winner_list) == 1:
                 index = 0
             else:

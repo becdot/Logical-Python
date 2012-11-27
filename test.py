@@ -85,33 +85,29 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(Multi.to_decimel(m_zero), 0)
 
 
+    def test_Multi_pad(self):
+        "Checks that Multi instances of uneven length are padded appropriately, and that instances of equal length are returned unchanged"
+
+        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
+        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_three, m_zero)]), (str(m_three), str(Multi([zero, zero]))))
+        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
+        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_eight, m_one)]), (str(m_eight), str(Multi([zero, zero, zero, one]))))
+        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_fourteen, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
+
     def test_Multi_and(self):
         "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"
-        "TODO - pad_multi changes the underlying Multi arrays, needs fixing"
 
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
-        m_one = Multi([zero, zero, one])
-        m_zero = Multi([zero])
-
-        self.assertEquals(str(m_eight & m_zero), str(m_zero))
-        self.assertEquals(str(m_eight & m_one), str(m_zero))
+        zero4 = Multi([zero, zero, zero, zero])
+        two4 = Multi([zero, zero, one, zero])
+        
+        self.assertEquals(str(m_eight & m_zero), str(zero4))
+        self.assertEquals(str(m_eight & m_one), str(zero4))
         self.assertEquals(str(m_eight & m_fifteen), str(m_eight))
-        self.assertEquals(str(m_three & m_fourteen), str(Multi([zero, zero, one, zero])))
+        self.assertEquals(str(m_three & m_fourteen), str(two4))
         self.assertEquals(str(m_one & m_three), str(m_one))
 
     def test_Multi_not(self):
         "Checks that the multibit ~ flips all the signs of a Multi array"
-        "TODO - Once pad_multi is fixed to not modify underlying Multi arrays, move test values outside the test function"
-
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
-        m_one = Multi([zero, zero, one])
-        m_zero = Multi([zero])
 
         self.assertEquals(str(~m_fifteen), str(Multi([zero, zero, zero, zero])))
         self.assertEquals(str(~m_eight), str(Multi([zero, one, one, one])))
@@ -121,43 +117,23 @@ class TestLogic(unittest.TestCase):
 
     def test_Multi_or(self):
         "Checks that multibit | returns the correct value and pads Multi arrays of different sizes appropriately"
-        "TODO - pad_multi changes the underlying Multi arrays, needs fixing"
-
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
-        m_one = Multi([zero, zero, one])
-        m_zero = Multi([zero])
 
         self.assertEquals(str(m_eight | m_zero), str(m_eight))
         self.assertEquals(str(m_eight | m_one), str(Multi([one, zero, zero, one])))
         self.assertEquals(str(m_eight | m_fifteen), str(m_fifteen))
-        self.assertEquals(str(m_three | m_one), str(Multi([zero, zero, one, one])))
+        self.assertEquals(str(m_three | m_one), str(Multi([zero, one, one])))
         self.assertEquals(str(m_one | m_fourteen), str(m_fifteen))
 
     def test_multimux(self):
 
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
-        m_one = Multi([zero, zero, one])
-        m_zero = Multi([zero])
+        zero3 = Multi([zero, zero, zero])
 
         self.assertEquals(str(Multi.multimux(m_eight, m_zero, zero)), str(m_eight))
         self.assertEquals(str(Multi.multimux(m_eight, m_fifteen, one)), str(m_fifteen))
-        self.assertEquals(str(Multi.multimux(m_zero, m_one, zero)), str(m_zero))
+        self.assertEquals(str(Multi.multimux(m_zero, m_one, zero)), str(zero3))
         self.assertEquals(str(Multi.multimux(m_zero, m_one, one)), str(m_one))
 
     def test_or_multiway(self):
-
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
-        m_one = Multi([zero, zero, one])
-        m_zero = Multi([zero])
 
         self.assertTrue(str(Multi.or_multiway(m_eight)))
         self.assertTrue(str(Multi.or_multiway(m_fifteen)))
@@ -166,16 +142,12 @@ class TestLogic(unittest.TestCase):
 
     def test_multimux_multiway(self):
 
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
-        m_one = Multi([zero, zero, one])
-        m_zero = Multi([zero])
+        one4 = Multi([zero, zero, zero, one])
+        zero4 = Multi([zero, zero, zero, zero])
 
         self.assertEquals(str(Multi.multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(m_one))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(m_zero))
+        self.assertEquals(str(Multi.multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(one4))
+        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(zero4))
         self.assertEquals(str(Multi.multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
                                                       m_fifteen, m_fourteen)), str(m_eight))
         self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
