@@ -161,10 +161,11 @@ class Multi:
                             for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)])
 
 
-        return reduce_winner(sel, m_list)
+        return Multi(reduce_winner(sel, m_list))
 
     @staticmethod
     def dmux_multiway(a, sel):
+        "Takes an input and a selector and returns a list of Bits where the sel Bit = input, and all others Bits = 0"
         num_outputs = 2**len(sel)
 
         def expand_winner(winner_list, s):
@@ -180,6 +181,4 @@ class Multi:
             return expand_winner(winners, s)
 
         return expand_winner(a, sel)
-
-
 
