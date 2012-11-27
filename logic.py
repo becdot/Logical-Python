@@ -82,6 +82,35 @@ class Multi:
     def __getitem__(self, index):
         return self.value[index]
 
+    def __lt__(self, mult):
+        if self.value < mult.value:
+            return True
+        return False
+
+    def __le__(self, mult):
+        if self.value <= mult.value:
+            return True
+        return False
+
+    def __gt__(self, mult):
+        if self.value > mult.value:
+            return True
+        return False
+
+    def __ge__(self, mult):
+        if self.value >= mult.value:
+            return True
+        return False
+    def __eq__(self, mult):
+        if self.value == mult.value:
+            return True
+        return False
+
+    def __ne__(self, mult):
+        if self.value != mult.value:
+            return True
+        return False
+
     def to_decimel(self):
         "Converts a Multi instance to a decimel representation"
         return sum([(bit * 2**i) for i, bit in enumerate(reversed(self.value))])
@@ -107,7 +136,7 @@ class Multi:
             shortest.value.insert(0, Bit(0))
         assert len(longest) == len(shortest)
 
-        if longest.value == self.value:
+        if longest == self:
             return (longest, shortest)
         return (shortest, longest)
  
@@ -150,7 +179,8 @@ class Multi:
             pow_two = int(math.log(len(winner_list), 2))
             curr_sel = sel[-pow_two]
             return reduce_winner(sel, [winner_list[i].multimux(winner_list[i + pow_two], curr_sel) 
-                                        for i, m in enumerate(winner_list) if (i + pow_two) < len(winner_list)])
+                                        for i, m in enumerate(winner_list) 
+                                        if (i + pow_two) < len(winner_list)])
 
         return Multi(reduce_winner(sel, m_list))
 
