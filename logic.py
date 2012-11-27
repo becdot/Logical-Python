@@ -155,7 +155,6 @@ class Multi:
 
         def reduce_winner(sel, winner_list):
             if len(winner_list) == 1:
-                print "winner!"
                 return winner_list[0]
             pow_two = int(math.log(len(winner_list), 2))
             curr_sel = sel[-pow_two]
@@ -167,35 +166,22 @@ class Multi:
         return reduce_winner(sel, m_list)
 
     @staticmethod
-    def dmux_multiway(input, sel):
+    def dmux_multiway(a, sel):
         num_outputs = 2**len(sel)
 
-        print "sel", sel
-        print "num outputs", num_outputs
-
         def expand_winner(winner_list, s):
-            print "winner_list =", winner_list, "s =", s
             if len(winner_list) == num_outputs:
                 return winner_list
+
             if len(winner_list) == 1:
-                winner_list = Bit.dmux(input[0], s[0])
-                print "if", winner_list
-                print [str(pair) for pair in winner_list]
-                return expand_winner(winner_list, s)
+                index = 0
             else:
-                log = int(math.log(len(winner_list), 2))
-                print "else", winner_list
-                print [str(pair) for pair in winner_list]
-                winner_list = [Bit.dmux(pair, s[log]) for pair in winner_list]
-                return expand_winner(winner_list, s)
+                index = int(math.log(len(winner_list), 2))
+            winners = [Bit.dmux(winner, s[index]) for winner in winner_list] # Split winners using dmux
+            winners = [instance for sublist in winners for instance in sublist] # Collapse list
+            return expand_winner(winners, s)
 
-        return expand_winner(input, sel)
-
-
-
-
-
-
+        return expand_winner(a, sel)
 
 
 
