@@ -182,17 +182,13 @@ class TestLogic(unittest.TestCase):
                                                       m_fifteen, m_fourteen)), str(m_fourteen))
 
     def test_dmux_multiway(self):
-        m_fifteen = Multi([one, one, one, one])
-        m_fourteen = Multi([one, one, one, zero])
-        m_eight = Multi([one, zero, zero, zero])
-        m_three = Multi([one, one])
         m_one = Multi([one])
         m_zero = Multi([zero])
 
         a = Multi.dmux_multiway(m_one, m_zero)
-        b = Multi.dmux_multiway(Multi([one]), Multi([zero, one]))
-        c = Multi.dmux_multiway(Multi([one]), Multi([one, one]))
-        d = Multi.dmux_multiway(Multi([one]), Multi([zero, one, one]))
+        b = Multi.dmux_multiway(m_one, Multi([zero, one]))
+        c = Multi.dmux_multiway(m_one, Multi([one, one]))
+        d = Multi.dmux_multiway(m_one, Multi([zero, one, one]))
         
         self.assertEquals([str(bit) for bit in a], [str(Multi([one])), str(Multi([zero]))])
         self.assertEquals([str(bit) for bit in b], [str(Multi([zero])), str(Multi([one])), str(Multi([zero])), str(Multi([zero]))])

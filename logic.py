@@ -6,7 +6,7 @@ import math
 ### 2. Take out static methods
 ### 3. Modify pad_multi() so that it doesn't change the underlying Multi instances
 ### 4. Have mux and dmux return Bit instances, and multi mux and dmux return Multi instances??
-### 5. Enable multidmux?
+### 5. Enable multidmux (currently can only accept a one-bit input)
 
 
 class Bit:
@@ -15,7 +15,7 @@ class Bit:
 
     def __init__(self, value):
         "Initialise Bit with a value or either 1 or 0"
-        assert value in [0, '0', 1, '1'], "Bit must be either a 1 or 0!"
+        #assert value in [0, '0', False, 1, '1', True], "Bit must be either a 1 or 0!"
         self.value = int(value)
 
     def __str__(self):
@@ -59,14 +59,12 @@ class Bit:
     @staticmethod
     def mux(a, b, sel):
         "If sel = 0, returns a; if sel = 1, returns b"
-        "TODO does this need to return a Bit instance?"
-        return (a & ~sel | (b & sel))  
+        return Bit(a & ~sel) | Bit(b & sel)
 
     @staticmethod
     def dmux(a, sel):
         "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
-        "TODO does this need to return a Bit instance?"
-        return [(a & ~sel), (a & sel)]
+        return [Bit(a & ~sel), Bit(a & sel)]
 
 class Multi:
     "TODO -- negative Multibit values are not handled properly"
