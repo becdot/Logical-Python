@@ -1,5 +1,6 @@
 from bit import Bit
 from multi import Multi
+from ALU import *
 
 import unittest
 
@@ -167,6 +168,47 @@ class TestLogic(unittest.TestCase):
         self.assertEquals([str(bit) for bit in c], [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([one]))])
         self.assertEquals([str(bit) for bit in d], [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([one])), 
                                                     str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([zero]))])
+
+    def test_half_adder(self):
+        s, c = half_adder(zero, zero)
+        self.assertFalse(s)
+        self.assertFalse(c)
+        s, c = half_adder(zero, one)
+        self.assertTrue(s)
+        self.assertFalse(c)        
+        s, c = half_adder(one, zero)
+        self.assertTrue(s)
+        self.assertFalse(c)        
+        s, c = half_adder(one, one)
+        self.assertFalse(s)
+        self.assertTrue(c)
+
+    def test_full_adder(self):
+        s, c = full_adder(zero, zero, zero)
+        self.assertFalse(s)
+        self.assertFalse(c)
+        s, c = full_adder(zero, zero, one)
+        self.assertTrue(s)
+        self.assertFalse(c)
+        s, c = full_adder(zero, one, zero)
+        self.assertTrue(s)
+        self.assertFalse(c)
+        s, c = full_adder(zero, one, one)
+        self.assertFalse(s)
+        self.assertTrue(c)
+        s, c = full_adder(one, zero, zero)
+        self.assertTrue(s)
+        self.assertFalse(c)
+        s, c = full_adder(one, zero, one)
+        self.assertFalse(s)
+        self.assertTrue(c)
+        s, c = full_adder(one, one, zero)
+        self.assertFalse(s)
+        self.assertTrue(c)
+        s, c = full_adder(one, one, one)
+        self.assertTrue(s)
+        self.assertTrue(c)
+
 
 
 
