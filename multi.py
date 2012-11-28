@@ -79,6 +79,23 @@ class Multi:
         if longest == self:
             return (longest, shortest)
         return (shortest, longest)
+
+    def pad_to_digits(self, digits, *mult):
+        "Takes two Multi arrays and pads them to a specified number of digits"
+        print self, [str(i) for i in mult]
+        base = Multi([Bit(0)])
+        m = [Multi(m) for m in mult]
+        m.insert(0, Multi(self))
+        print "m", [str(i) for i in m]
+        pad_m = [base.pad_multi(instance) for instance in m]
+        print "pad_m", [str(i) for j in pad_m for i in j]
+        if len(pad_m[0]) >= digits:
+            return (m)
+        diff = digits - len(pad_m[0])
+        for i in range(diff):
+            for instance in m:
+                instance.value.insert(0, Bit(0))
+        return (m)
  
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
