@@ -8,9 +8,6 @@ class Multi:
 
     def __init__(self, bit_list):
         "Multi is a list of Bits"
-        # As it turns out, this is a better method, because it would allow
-        # a generator to be passed in as bit_list -- a slice fails on a
-        # generator.
         self.value = [bit for bit in bit_list]
 
     def __len__(self):
@@ -73,9 +70,6 @@ class Multi:
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
 
 
-# I would move these outside of Multi for reasons similar to mux and dmux.
-# I like the idea of having data -- Bits and Multis -- and then having
-# a set of functions that operate on that data. (Others may disagree.)
 def pad_multi(mult1, mult2):
     "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
     if len(mult1) == len(mult2):
@@ -91,7 +85,6 @@ def pad_multi(mult1, mult2):
         return (longest, shortest)
     return (shortest, longest)
 
-
 def pad_to_digits(mult1, digits, *mult):
     """Takes two Multi arrays and pads them to a specified number of digits
         If both instances have the same length, will return (m1, m2) unchanged. If a Multi instance is longer than the number of digits, 
@@ -102,20 +95,14 @@ def pad_to_digits(mult1, digits, *mult):
     pad_m = [pad_multi(base, instance)[1] for instance in m]
     return pad_m
 
-
 def multimux(mult1, mult2, sel):
     "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
     a, b = pad_multi(mult1, mult2)
     return Multi(mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value))
 
-
 def or_multiway(mult):
     "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
-    # This may be less clear than the previous version, but it's a good
-    # opportunity to learn about reduce (otherwise known as fold) if you
-    # haven't seen it before :).
     return reduce(lambda base, bit: base | bit, mult, Bit(0))
-
 
 def multimux_multiway(sel, *m_list):
     "Takes a variable number of Multi instances (must be a power of two) and returns the Multi instance indicated by the selector"

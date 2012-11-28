@@ -1,12 +1,12 @@
 To-do:
 
-1. Figure out how to represent negative binary values
+-  Figure out how to represent negative binary values
    - pos and neg subclass of Multi?
-2. Enable multidmux (currently can only accept a one-bit input)?
-3. Take out unnecessary functions (comparisons?)
-4. Find a better way to test equality in test.py, rather than having str(Multi) all over the place
-5. Better formula for full_adder?
-6. Collapse full and half adders into one function?
-7. Make Multi instances index from the right?
-   - Does halfadder need to index from the right?
-
+- Enable multidmux (currently can only accept a one-bit input)?
+-  Take out unnecessary functions (comparisons?)
+-  Find a better way to test equality in test.py, rather than having str(Multi) all over the place
+-  Better formula for full_adder?
+-  Collapse full and half adders into one function?
+-  Make Multi instances index from the right?
+   - Does halfadder need to index from the right
+-  Define multimux_multiway as a reduce function?
