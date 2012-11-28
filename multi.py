@@ -67,7 +67,7 @@ class Multi:
 
     def pad_multi(self, mult):
         "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
-        if not (len(self) - len(mult)):
+        if len(self) - len(mult) == 0:
             return (self, mult)
         longest = Multi(max(self, mult, key=len))
         shortest = Multi(min(self, mult, key=len))
@@ -81,21 +81,14 @@ class Multi:
         return (shortest, longest)
 
     def pad_to_digits(self, digits, *mult):
-        "Takes two Multi arrays and pads them to a specified number of digits"
-        print self, [str(i) for i in mult]
-        base = Multi([Bit(0)])
+        """Takes two Multi arrays and pads them to a specified number of digits
+            If both instances have the same length, will return (m1, m2) unchanged. If a Multi instance is longer than the number of digits, 
+            will return (m1, m2) unchanged"""
         m = [Multi(m) for m in mult]
         m.insert(0, Multi(self))
-        print "m", [str(i) for i in m]
-        pad_m = [base.pad_multi(instance) for instance in m]
-        print "pad_m", [str(i) for j in pad_m for i in j]
-        if len(pad_m[0]) >= digits:
-            return (m)
-        diff = digits - len(pad_m[0])
-        for i in range(diff):
-            for instance in m:
-                instance.value.insert(0, Bit(0))
-        return (m)
+        base = Multi([Bit(0) for digit in range(digits)])
+        pad_m = [base.pad_multi(instance)[1] for instance in m]
+        return (pad_m)
  
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
