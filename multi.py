@@ -24,33 +24,22 @@ class Multi:
         return self.value[index]
 
     def __lt__(self, mult):
-        if self.value < mult.value:
-            return True
-        return False
+        return self.value < mult.value
 
     def __le__(self, mult):
-        if self.value <= mult.value:
-            return True
-        return False
+        return self.value <= mult.value
 
     def __gt__(self, mult):
-        if self.value > mult.value:
-            return True
-        return False
+        return self.value > mult.value
 
     def __ge__(self, mult):
-        if self.value >= mult.value:
-            return True
-        return False
+        return self.value >= mult.value
+
     def __eq__(self, mult):
-        if self.value == mult.value:
-            return True
-        return False
+        return self.value == mult.value
 
     def __ne__(self, mult):
-        if self.value != mult.value:
-            return True
-        return False
+        return self.value != mult.value
 
     def to_decimel(self):
         "Converts a Multi instance to a decimel representation"
