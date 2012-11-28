@@ -50,16 +50,6 @@ class Multi:
             return MSB + LSB_sum
         return sum((bit * 2**i) for i, bit in enumerate(reversed(self.value)))
 
-    def from_num(self):
-        "Enables construction of a Multi instance using a number or binary number"
-        try:
-            bnum = bin(self)
-        except TypeError:
-            bnum = self
-        b = bnum.index('b') + 1
-
-        return Multi(Bit(int(digit)) for digit in bnum[b:])
-
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
         m1, m2 = pad_multi(self, mult)
@@ -74,15 +64,19 @@ class Multi:
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
 
+
 def pad_multi(mult1, mult2):
-    "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
+    "Takes two Multi arrays and pads the shorter one with Bit(0) if it is a negative number, and Bit(1) if it is negative"
     if len(mult1) == len(mult2):
         return (mult1, mult2)
     longest = Multi(max(mult1, mult2, key=len))
     shortest = Multi(min(mult1, mult2, key=len))
     diff = len(longest) - len(shortest)
     for i in range(diff):
-        shortest.value.insert(0, Bit(0))
+        if shortest.to_decimel() < 0:
+            shortest.value.insert(0, Bit(1))
+        else:
+            shortest.value.insert(0, Bit(0))
     assert len(longest) == len(shortest)
 
     if longest == mult1:

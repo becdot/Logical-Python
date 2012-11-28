@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway,\
         multimux_multiway, dmux_multiway
-from ALU import half_adder, full_adder, add_multi, inc
+from ALU import half_adder, full_adder, add_multi, inc, from_num
 
 import unittest
 
@@ -15,11 +15,13 @@ m_three = Multi([one, one])
 m_one = Multi([zero, zero, one])
 m_zero = Multi([zero])
 
-neg_one = Multi(Bit(digit) for digit in '11111111')
-neg_two = Multi(Bit(digit) for digit in '11111110')
-neg_three = Multi(Bit(digit) for digit in '11111101')
-neg_four = Multi(Bit(digit) for digit in '11111100')
-neg_eight = Multi(Bit(digit) for digit in '11111000')
+neg_one = Multi(Bit(digit) for digit in '1111111111111111')
+neg_two = Multi(Bit(digit) for digit in '1111111111111110')
+neg_three = Multi(Bit(digit) for digit in '1111111111111101')
+neg_four = Multi(Bit(digit) for digit in '1111111111111100')
+neg_eight = Multi(Bit(digit) for digit in '1111111111111000')
+neg_fourteen = Multi(Bit(digit) for digit in '1111111111100100')
+neg_fifteen = pad_to_digits(16, from_num(-15))[0]
 
 zero16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero])
 one16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one])
@@ -166,6 +168,7 @@ class TestLogic(unittest.TestCase):
 
     def test_Multi_and(self):
         "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"
+        "Tested with negative numbers"
 
         zero4 = Multi([zero, zero, zero, zero])
         two4 = Multi([zero, zero, one, zero])
@@ -175,6 +178,11 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(m_eight & m_fifteen), str(m_eight))
         self.assertEquals(str(m_three & m_fourteen), str(two4))
         self.assertEquals(str(m_one & m_three), str(m_one))
+        self.assertEquals(str(eight16 & neg_eight), str(eight16))
+        self.assertEquals(str(eight16 & neg_four), str(eight16))
+        self.assertEquals(str(zero16 & neg_one), str(zero16))
+        self.assertEquals(str(neg_three & m_fourteen), str(pad_to_digits(16, from_num(12))[0]))
+        self.assertEquals(str(neg_one & neg_three), str(neg_three))
 
     def test_Multi_not(self):
         "Checks that the multibit ~ flips all the signs of a Multi array"
