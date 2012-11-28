@@ -24,22 +24,22 @@ class Multi:
         return self.value[index]
 
     def __lt__(self, mult):
-        return self.value < mult.value
+        return self.to_decimel() < mult.to_decimel()
 
     def __le__(self, mult):
-        return self.value <= mult.value
+        return self.to_decimel() <= mult.to_decimel()
 
     def __gt__(self, mult):
-        return self.value > mult.value
+        return self.to_decimel() > mult.to_decimel()
 
     def __ge__(self, mult):
-        return self.value >= mult.value
+        return self.to_decimel() >= mult.to_decimel()
 
     def __eq__(self, mult):
-        return self.value == mult.value
+        return self.to_decimel() == mult.to_decimel()
 
     def __ne__(self, mult):
-        return self.value != mult.value
+        return self.to_decimel() != mult.to_decimel()
 
     def to_decimel(self):
         "Converts a Multi instance to a decimel representation"
@@ -68,7 +68,6 @@ class Multi:
         "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
-
 
 def pad_multi(mult1, mult2):
     "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
