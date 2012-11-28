@@ -42,7 +42,12 @@ class Multi:
         return self.to_decimel() != mult.to_decimel()
 
     def to_decimel(self):
-        "Converts a Multi instance to a decimel representation"
+        """Converts a Multi instance to a decimel representation
+            A Multi instance is negative if Multi[0] = 1 and len(Multi) > 4"""
+        if len(self) > 4 and int(self[0]) == 1:
+            LSB_sum = sum((bit * 2**i) for i, bit in enumerate(reversed(self.value[1:])))
+            MSB = -1 * 2 ** (len(self) - 1)
+            return MSB + LSB_sum
         return sum((bit * 2**i) for i, bit in enumerate(reversed(self.value)))
 
     def from_num(self):

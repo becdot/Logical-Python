@@ -11,3 +11,4 @@ To-do:
    - Does halfadder need to index from the right
 -  Define multimux_multiway as a reduce function?
 - Create a truncate function that chops off the extra zeroes on the left?
+- Why can't Multi[i] == (1 or True) evaluate correctly?  (in to_decimel)

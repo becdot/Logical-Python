@@ -15,6 +15,12 @@ m_three = Multi([one, one])
 m_one = Multi([zero, zero, one])
 m_zero = Multi([zero])
 
+neg_one = Multi(Bit(digit) for digit in '11111111')
+neg_two = Multi(Bit(digit) for digit in '11111110')
+neg_three = Multi(Bit(digit) for digit in '11111101')
+neg_four = Multi(Bit(digit) for digit in '11111100')
+neg_eight = Multi(Bit(digit) for digit in '11111000')
+
 zero16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero])
 one16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one])
 three16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one])
@@ -22,8 +28,8 @@ four16 = pad_to_digits(16, Multi([one, zero, zero]))[0]
 eight16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero, zero, zero])
 fourteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, zero])
 fifteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, one])
-m_37460  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, zero])
-m_37461  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, one])
+m_16384  = Multi([zero, one, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, zero])
+m_16385  = Multi([zero, one, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, one])
 
 
 class TestLogic(unittest.TestCase):
@@ -96,7 +102,8 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(m_three == three16)
         self.assertTrue(m_three == Multi([one, one]))
         self.assertTrue(zero16 < m_one)
-        self.assertTrue(m_fourteen <= m_37460)
+        self.assertTrue(m_fourteen <= m_16384)
+
 
     def test_Multi_to_decimel(self):
         "Binary -> decimel"
@@ -268,7 +275,7 @@ class TestLogic(unittest.TestCase):
     def test_add_multi(self):
 
         self.assertEquals(str(add_multi(m_one, m_three)), str(four16))
-        self.assertEquals(str(add_multi(m_one, m_37460)), str(m_37461))
+        self.assertEquals(str(add_multi(m_one, m_16384)), str(m_16385))
         self.assertEquals(str(add_multi(m_zero, m_one)), str(one16))
         self.assertEquals(str(add_multi(m_fourteen, m_one)), str(fifteen16))
         self.assertEquals(str(add_multi(m_three, m_three)), 
@@ -276,10 +283,16 @@ class TestLogic(unittest.TestCase):
 
     def test_inc(self):
 
-        self.assertEquals(str(inc(m_37460)), str(m_37461))
+        self.assertEquals(str(inc(m_16384)), str(m_16385))
         self.assertEquals(str(inc(m_zero)), str(one16))
         self.assertEquals(str(inc(m_three)), str(four16))
 
+    def test_negative_to_decimel(self):
+
+        self.assertEquals(Multi.to_decimel(neg_one), -1)
+        self.assertEquals(Multi.to_decimel(neg_two), -2)
+        self.assertEquals(Multi.to_decimel(neg_three), -3)
+        self.assertEquals(Multi.to_decimel(neg_four), -4)
 
 
 
