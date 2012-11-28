@@ -56,7 +56,7 @@ class Multi:
             bnum = self
         b = bnum.index('b') + 1
 
-        return Multi([Bit(int(digit)) for digit in bnum[b:]])
+        return Multi(Bit(int(digit)) for digit in bnum[b:])
 
     def pad_multi(self, mult):
         "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
@@ -93,21 +93,21 @@ class Multi:
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
         m1, m2 = self.pad_multi(mult)
-        return Multi([(pair[0] & pair[1]) for pair in zip(m1.value, m2.value)])
+        return Multi((pair[0] & pair[1]) for pair in zip(m1.value, m2.value))
 
     def __invert__(self):
         "Overloads the ~ operator so that out[0] = ~in[0], out[1] = ~in[1] etc..."
-        return Multi([~bit for bit in self.value])
+        return Multi(~bit for bit in self.value)
 
     def __or__(self, mult):
         "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
         m1, m2 = self.pad_multi(mult)
-        return Multi([(pair[0] | pair[1]) for pair in zip(m1.value, m2.value)])
+        return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
 
     def multimux(self, mult, sel):
         "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
         a, b = self.pad_multi(mult)
-        return Multi([mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value)])
+        return Multi(mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value))
 
     def or_multiway(self):
         "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
