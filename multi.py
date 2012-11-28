@@ -2,12 +2,13 @@ from bit import Bit, dmux, mux
 
 import math
 
+
 class Multi:
     "TODO -- negative Multibit values are not handled properly"
-    
+
     def __init__(self, bit_list):
         "Multi is a list of Bits"
-        self.value = [bit for bit in bit_list]
+        self.value = bit_list[:]
 
     def __len__(self):
         return len(self.value)
