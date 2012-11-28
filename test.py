@@ -1,4 +1,4 @@
-from bit import Bit
+from bit import Bit, nand
 from multi import Multi
 from ALU import *
 
@@ -6,7 +6,6 @@ import unittest
 
 zero = Bit(0)
 one = Bit(1)
-nand = Bit.nand
 
 m_fifteen = Multi([one, one, one, one])
 m_fourteen = Multi([one, one, one, zero])
