@@ -1,12 +1,12 @@
-from bit import Bit
-from multi import Multi
+from bit import Bit, nand, mux, dmux
+from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway,\
+        multimux_multiway, dmux_multiway
 from ALU import *
 
 import unittest
 
 zero = Bit(0)
 one = Bit(1)
-nand = Bit.nand
 
 m_fifteen = Multi([one, one, one, one])
 m_fourteen = Multi([one, one, one, zero])
@@ -60,27 +60,27 @@ class TestLogic(unittest.TestCase):
 
     def test_mux(self):
         "Defines a truth table for mux"
-        self.assertFalse(Bit.mux(zero, zero, zero))
-        self.assertFalse(Bit.mux(zero, zero, one))
-        self.assertFalse(Bit.mux(zero, one, zero))
-        self.assertTrue(Bit.mux(zero, one, one))
-        self.assertTrue(Bit.mux(one, zero, zero))
-        self.assertFalse(Bit.mux(one, zero, one))
-        self.assertTrue(Bit.mux(one, one, zero))
-        self.assertTrue(Bit.mux(one, one, one))
+        self.assertFalse(mux(zero, zero, zero))
+        self.assertFalse(mux(zero, zero, one))
+        self.assertFalse(mux(zero, one, zero))
+        self.assertTrue(mux(zero, one, one))
+        self.assertTrue(mux(one, zero, zero))
+        self.assertFalse(mux(one, zero, one))
+        self.assertTrue(mux(one, one, zero))
+        self.assertTrue(mux(one, one, one))
 
     def test_dmux(self):
         "Defines a truth table for dmux"
-        a, b = Bit.dmux(zero, zero)
+        a, b = dmux(zero, zero)
         self.assertFalse(a)
         self.assertFalse(b)
-        a, b = Bit.dmux(zero, one)
+        a, b = dmux(zero, one)
         self.assertFalse(a)
         self.assertFalse(b)
-        a, b = Bit.dmux(one, zero)
+        a, b = dmux(one, zero)
         self.assertTrue(a)
         self.assertFalse(b)
-        a, b = Bit.dmux(one, one)
+        a, b = dmux(one, one)
         self.assertFalse(a)
         self.assertTrue(b)
 
@@ -96,12 +96,12 @@ class TestLogic(unittest.TestCase):
     def test_Multi_pad(self):
         "Checks that Multi instances of uneven length are padded appropriately, and that instances of equal length are returned unchanged"
 
-        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_one, m_zero)]), (str(m_one), str(Multi([zero, zero, zero]))))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_three, m_zero)]), (str(m_three), str(Multi([zero, zero]))))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_eight, m_one)]), (str(m_eight), str(Multi([zero, zero, zero, one]))))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_multi(m_fourteen, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_one, m_zero)]), (str(m_one), str(Multi([zero, zero, zero]))))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_three, m_zero)]), (str(m_three), str(Multi([zero, zero]))))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_eight, m_one)]), (str(m_eight), str(Multi([zero, zero, zero, one]))))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_fourteen, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
 
     def test_Multi_pad_to_digits_with_two_inputs(self):
         """Checks that Multi arrays are padded to the specified number of digits, instances of equal length are returned unchanged,
@@ -112,12 +112,12 @@ class TestLogic(unittest.TestCase):
         zero4 = Multi([zero, zero, zero, zero])
         one4 = Multi([zero, zero, zero, one])
 
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_eight, 4, m_one)]), (str(m_eight), str(one4)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_one, 4, m_eight)]), (str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_zero, 3, m_one)]), (str(zero3), str(m_one)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_three, 4, m_zero)]), (str(three4), str(zero4)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_one, 1, m_zero)]), (str(m_one), str(m_zero)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_three, 4, m_one)]), (str(three4), str(one4)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_eight, 4, m_one)]), (str(m_eight), str(one4)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_one, 4, m_eight)]), (str(one4), str(m_eight)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_zero, 3, m_one)]), (str(zero3), str(m_one)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4, m_zero)]), (str(three4), str(zero4)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_one, 1, m_zero)]), (str(m_one), str(m_zero)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4, m_one)]), (str(three4), str(one4)))
 
     def test_Multi_pad_to_digits_with_variable_inputs(self):
         """Checks that Multi arrays are padded to the specified number of digits, instances of equal length are returned unchanged,
@@ -128,15 +128,13 @@ class TestLogic(unittest.TestCase):
         zero4 = Multi([zero, zero, zero, zero])
         one4 = Multi([zero, zero, zero, one])
 
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_zero, 3)]), (str(zero3),))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_three, 4)]), (str(three4),))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_one, 1)]), (str(m_one),))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_three, 4)]), (str(three4),))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_zero, 4, m_one, m_eight)]), (str(zero4), str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_eight, 4, m_one, m_eight)]), (str(m_eight), str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in Multi.pad_to_digits(m_fourteen, 4, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
-
-
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_zero, 3)]), (str(zero3),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4)]), (str(three4),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_one, 1)]), (str(m_one),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4)]), (str(three4),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_zero, 4, m_one, m_eight)]), (str(zero4), str(one4), str(m_eight)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_eight, 4, m_one, m_eight)]), (str(m_eight), str(one4), str(m_eight)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_fourteen, 4, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
 
     def test_Multi_and(self):
         "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"
@@ -172,39 +170,39 @@ class TestLogic(unittest.TestCase):
 
         zero3 = Multi([zero, zero, zero])
 
-        self.assertEquals(str(Multi.multimux(m_eight, m_zero, zero)), str(m_eight))
-        self.assertEquals(str(Multi.multimux(m_eight, m_fifteen, one)), str(m_fifteen))
-        self.assertEquals(str(Multi.multimux(m_zero, m_one, zero)), str(zero3))
-        self.assertEquals(str(Multi.multimux(m_zero, m_one, one)), str(m_one))
+        self.assertEquals(str(multimux(m_eight, m_zero, zero)), str(m_eight))
+        self.assertEquals(str(multimux(m_eight, m_fifteen, one)), str(m_fifteen))
+        self.assertEquals(str(multimux(m_zero, m_one, zero)), str(zero3))
+        self.assertEquals(str(multimux(m_zero, m_one, one)), str(m_one))
 
     def test_or_multiway(self):
 
-        self.assertTrue(str(Multi.or_multiway(m_eight)))
-        self.assertTrue(str(Multi.or_multiway(m_fifteen)))
-        self.assertTrue(str(Multi.or_multiway(m_one)))
-        self.assertTrue(str(Multi.or_multiway(m_zero)))
+        self.assertTrue(str(or_multiway(m_eight)))
+        self.assertTrue(str(or_multiway(m_fifteen)))
+        self.assertTrue(str(or_multiway(m_one)))
+        self.assertTrue(str(or_multiway(m_zero)))
 
     def test_multimux_multiway(self):
 
         one4 = Multi([zero, zero, zero, one])
         zero4 = Multi([zero, zero, zero, zero])
 
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(one4))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(zero4))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
-                                                      m_fifteen, m_fourteen)), str(m_eight))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
+        self.assertEquals(str(multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
+        self.assertEquals(str(multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(one4))
+        self.assertEquals(str(multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(zero4))
+        self.assertEquals(str(multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
+                                                m_fifteen, m_fourteen)), str(m_eight))
+        self.assertEquals(str(multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
                                                       m_fifteen, m_fourteen)), str(m_fourteen))
 
     def test_dmux_multiway(self):
         m_one = Multi([one])
         m_zero = Multi([zero])
 
-        a = Multi.dmux_multiway(m_one, m_zero)
-        b = Multi.dmux_multiway(m_one, Multi([zero, one]))
-        c = Multi.dmux_multiway(m_one, Multi([one, one]))
-        d = Multi.dmux_multiway(m_one, Multi([zero, one, one]))
+        a = dmux_multiway(m_one, m_zero)
+        b = dmux_multiway(m_one, Multi([zero, one]))
+        c = dmux_multiway(m_one, Multi([one, one]))
+        d = dmux_multiway(m_one, Multi([zero, one, one]))
         
         self.assertEquals([str(bit) for bit in a], [str(Multi([one])), str(Multi([zero]))])
         self.assertEquals([str(bit) for bit in b], [str(Multi([zero])), str(Multi([one])), str(Multi([zero])), str(Multi([zero]))])

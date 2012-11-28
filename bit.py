@@ -20,35 +20,46 @@ class Bit:
         "Enables truth comparison of Bit instances"
         return self.value
 
-    @staticmethod
-    def nand(num1, num2):
-        """nand = not(a and b)
-        Defined as a static method because belongs logically within Bit, but syntaxtically outside it"""
-        return Bit(not(num1.value and num2.value))
-
     def __and__(self, num1):
         "Overloads the & operator using the nand function"
-        a = Bit.nand(self, num1)
-        return Bit.nand(a, a)
+        a = nand(self, num1)
+        return nand(a, a)
 
     def __invert__(self):
         "Overloads ~ to return logical not of a bit, instead of bitwise not"
-        return Bit.nand(self, self)
+        return nand(self, self)
 
     def __or__(self, num1):
         "Overloads the | operator using the nand function"
-        return Bit.nand(~self, ~num1)
+        return nand(~self, ~num1)
 
     def __xor__(self, num1):
-        "Overloads the | operator using the nand function"
+        "Overloads the ^ operator using the nand function"
         first = ~(self & ~num1)
         last = ~(num1 & ~self)
-        return Bit.nand(first, last)
+        return nand(first, last)
 
-    def mux(self, bit, sel):
-        "If sel = 0, returns a; if sel = 1, returns b"
-        return (self & ~sel) | (bit & sel)
 
-    def dmux(self, sel):
-        "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
-        return [(self & ~sel), (self & sel)]
+
+# The benefit of a @staticmethod is that it creates another layer of
+# namespacing. In this case, though, we're already inside of a `bit`
+# namespace, and so `nand` can live outside of the Bit class.
+def nand(bit1, bit2):
+    """nand = not(a and b), operating on two instances of bit.Bit."""
+    return Bit(not(bit1.value and bit2.value))
+
+
+# Pulling mux and dmux out of the Bit class is a questionable choice,
+# but one that I would personally choose to make. For mux, this is
+# because it operates "equally" on two bits -- the one passed in as
+# self was simply incidental. The argument for dmux isn't as strong,
+# but it does make it more portable (i.e. it could be used with an
+# alternative Bit implementation, for instance.)
+def mux(bit1, bit2, sel):
+    "If sel = 0, returns a; if sel = 1, returns b"
+    return (bit1 & ~sel) | (bit2 & sel)
+
+
+def dmux(bit, sel):
+    "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
+    return [(bit & ~sel), (bit & sel)]
