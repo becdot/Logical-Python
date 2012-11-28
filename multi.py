@@ -1,4 +1,4 @@
-from bit import Bit
+from bit import Bit, dmux, mux
 
 import math
 
@@ -114,7 +114,7 @@ class Multi:
     def multimux(self, mult, sel):
         "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
         a, b = self.pad_multi(mult)
-        return Multi([pair[0].mux(pair[1], sel) for pair in zip(a.value, b.value)])
+        return Multi([mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value)])
 
     def or_multiway(self):
         "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
@@ -152,7 +152,7 @@ class Multi:
                 index = 0
             else:
                 index = int(math.log(len(winner_list), 2))
-            winners = [Bit.dmux(winner, s[index]) for winner in winner_list] # Split winners using dmux
+            winners = [dmux(winner, s[index]) for winner in winner_list] # Split winners using dmux
             winners = [instance for sublist in winners for instance in sublist] # Collapse list
             return expand_winner(winners, s)
 

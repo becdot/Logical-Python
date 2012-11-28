@@ -39,13 +39,6 @@ class Bit:
         last = ~(num1 & ~self)
         return nand(first, last)
 
-    def mux(self, bit, sel):
-        "If sel = 0, returns a; if sel = 1, returns b"
-        return (self & ~sel) | (bit & sel)
-
-    def dmux(self, sel):
-        "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
-        return [(self & ~sel), (self & sel)]
 
 
 # The benefit of a @staticmethod is that it creates another layer of
@@ -54,3 +47,19 @@ class Bit:
 def nand(bit1, bit2):
     """nand = not(a and b), operating on two instances of bit.Bit."""
     return Bit(not(bit1.value and bit2.value))
+
+
+# Pulling mux and dmux out of the Bit class is a questionable choice,
+# but one that I would personally choose to make. For mux, this is
+# because it operates "equally" on two bits -- the one passed in as
+# self was simply incidental. The argument for dmux isn't as strong,
+# but it does make it more portable (i.e. it could be used with an
+# alternative Bit implementation, for instance.)
+def mux(bit1, bit2, sel):
+    "If sel = 0, returns a; if sel = 1, returns b"
+    return (bit1 & ~sel) | (bit2 & sel)
+
+
+def dmux(bit, sel):
+    "If sel = 0, returns [a=input, b=0]; if sel = 1, returns [a=0, b=input]"
+    return [(bit & ~sel), (bit & sel)]

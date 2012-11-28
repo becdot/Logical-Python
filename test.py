@@ -1,4 +1,4 @@
-from bit import Bit, nand
+from bit import Bit, nand, mux, dmux
 from multi import Multi
 from ALU import *
 
@@ -59,27 +59,27 @@ class TestLogic(unittest.TestCase):
 
     def test_mux(self):
         "Defines a truth table for mux"
-        self.assertFalse(Bit.mux(zero, zero, zero))
-        self.assertFalse(Bit.mux(zero, zero, one))
-        self.assertFalse(Bit.mux(zero, one, zero))
-        self.assertTrue(Bit.mux(zero, one, one))
-        self.assertTrue(Bit.mux(one, zero, zero))
-        self.assertFalse(Bit.mux(one, zero, one))
-        self.assertTrue(Bit.mux(one, one, zero))
-        self.assertTrue(Bit.mux(one, one, one))
+        self.assertFalse(mux(zero, zero, zero))
+        self.assertFalse(mux(zero, zero, one))
+        self.assertFalse(mux(zero, one, zero))
+        self.assertTrue(mux(zero, one, one))
+        self.assertTrue(mux(one, zero, zero))
+        self.assertFalse(mux(one, zero, one))
+        self.assertTrue(mux(one, one, zero))
+        self.assertTrue(mux(one, one, one))
 
     def test_dmux(self):
         "Defines a truth table for dmux"
-        a, b = Bit.dmux(zero, zero)
+        a, b = dmux(zero, zero)
         self.assertFalse(a)
         self.assertFalse(b)
-        a, b = Bit.dmux(zero, one)
+        a, b = dmux(zero, one)
         self.assertFalse(a)
         self.assertFalse(b)
-        a, b = Bit.dmux(one, zero)
+        a, b = dmux(one, zero)
         self.assertTrue(a)
         self.assertFalse(b)
-        a, b = Bit.dmux(one, one)
+        a, b = dmux(one, one)
         self.assertFalse(a)
         self.assertTrue(b)
 
