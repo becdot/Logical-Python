@@ -34,7 +34,7 @@ class Bit:
         return nand(~self, ~num1)
 
     def __xor__(self, num1):
-        "Overloads the | operator using the nand function"
+        "Overloads the ^ operator using the nand function"
         first = ~(self & ~num1)
         last = ~(num1 & ~self)
         return nand(first, last)
