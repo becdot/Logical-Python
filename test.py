@@ -1,5 +1,5 @@
 from bit import Bit, nand, mux, dmux
-from multi import Multi, pad_multi, pad_to_digits
+from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway
 from ALU import *
 
 import unittest
@@ -169,17 +169,17 @@ class TestLogic(unittest.TestCase):
 
         zero3 = Multi([zero, zero, zero])
 
-        self.assertEquals(str(Multi.multimux(m_eight, m_zero, zero)), str(m_eight))
-        self.assertEquals(str(Multi.multimux(m_eight, m_fifteen, one)), str(m_fifteen))
-        self.assertEquals(str(Multi.multimux(m_zero, m_one, zero)), str(zero3))
-        self.assertEquals(str(Multi.multimux(m_zero, m_one, one)), str(m_one))
+        self.assertEquals(str(multimux(m_eight, m_zero, zero)), str(m_eight))
+        self.assertEquals(str(multimux(m_eight, m_fifteen, one)), str(m_fifteen))
+        self.assertEquals(str(multimux(m_zero, m_one, zero)), str(zero3))
+        self.assertEquals(str(multimux(m_zero, m_one, one)), str(m_one))
 
     def test_or_multiway(self):
 
-        self.assertTrue(str(Multi.or_multiway(m_eight)))
-        self.assertTrue(str(Multi.or_multiway(m_fifteen)))
-        self.assertTrue(str(Multi.or_multiway(m_one)))
-        self.assertTrue(str(Multi.or_multiway(m_zero)))
+        self.assertTrue(str(or_multiway(m_eight)))
+        self.assertTrue(str(or_multiway(m_fifteen)))
+        self.assertTrue(str(or_multiway(m_one)))
+        self.assertTrue(str(or_multiway(m_zero)))
 
     def test_multimux_multiway(self):
 

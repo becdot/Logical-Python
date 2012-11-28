@@ -72,18 +72,6 @@ class Multi:
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
 
-    def multimux(self, mult, sel):
-        "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
-        a, b = pad_multi(self, mult)
-        return Multi(mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value))
-
-    def or_multiway(self):
-        "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
-        base = Bit(0)
-        for bit in self:
-            base = (base | bit)
-        return base
-
     @staticmethod
     def multimux_multiway(sel, *m_list):
         "Takes a variable number of Multi instances (must be a power of two) and returns the Multi instance indicated by the selector"
@@ -96,8 +84,8 @@ class Multi:
                 return winner_list[0]
             pow_two = int(math.log(len(winner_list), 2))
             curr_sel = sel[-pow_two]
-            return reduce_winner(sel, [winner_list[i].multimux(winner_list[i + pow_two], curr_sel) 
-                                        for i, m in enumerate(winner_list) 
+            return reduce_winner(sel, [multimux(winner_list[i], winner_list[i + pow_two], curr_sel)
+                                        for i, m in enumerate(winner_list)
                                         if (i + pow_two) < len(winner_list)])
 
         return Multi(reduce_winner(sel, m_list))
@@ -148,3 +136,17 @@ def pad_to_digits(mult1, digits, *mult):
     base = Multi([Bit(0) for digit in range(digits)])
     pad_m = [pad_multi(base, instance)[1] for instance in m]
     return (pad_m)
+
+
+def multimux(mult1, mult2, sel):
+    "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
+    a, b = pad_multi(mult1, mult2)
+    return Multi(mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value))
+
+
+def or_multiway(mult):
+    "Iterates through a Multi instance and returns Bit(1) if any bits = 1, and Bit(0) if all bits = 0"
+    # This may be less clear than the previous version, but it's a good
+    # opportunity to learn about reduce (otherwise known as fold) if you
+    # haven't seen it before :).
+    return reduce(lambda base, bit: base | bit, mult, Bit(0))
