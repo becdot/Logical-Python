@@ -72,41 +72,6 @@ class Multi:
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
 
-    @staticmethod
-    def multimux_multiway(sel, *m_list):
-        "Takes a variable number of Multi instances (must be a power of two) and returns the Multi instance indicated by the selector"
-        log = int(math.log(len(m_list), 2))
-        assert len(sel) == log, "sel must be {0} bits".format(log)
-        assert len(m_list) in [2**i for i in range(16)], "The list of variables must be a power of two"
-
-        def reduce_winner(sel, winner_list):
-            if len(winner_list) == 1:
-                return winner_list[0]
-            pow_two = int(math.log(len(winner_list), 2))
-            curr_sel = sel[-pow_two]
-            return reduce_winner(sel, [multimux(winner_list[i], winner_list[i + pow_two], curr_sel)
-                                        for i, m in enumerate(winner_list)
-                                        if (i + pow_two) < len(winner_list)])
-
-        return Multi(reduce_winner(sel, m_list))
-
-    def dmux_multiway(self, sel):
-        "Takes an input and a selector and returns a list of Bits where the sel Bit = input, and all others Bits = 0"
-        num_outputs = 2**len(sel)
-
-        def expand_winner(winner_list, s):
-            if len(winner_list) == num_outputs:
-                return winner_list
-            if len(winner_list) == 1:
-                index = 0
-            else:
-                index = int(math.log(len(winner_list), 2))
-            winners = [dmux(winner, s[index]) for winner in winner_list] # Split winners using dmux
-            winners = [instance for sublist in winners for instance in sublist] # Collapse list
-            return expand_winner(winners, s)
-
-        return expand_winner(self, sel)
-
 
 # I would move these outside of Multi for reasons similar to mux and dmux.
 # I like the idea of having data -- Bits and Multis -- and then having
@@ -150,3 +115,37 @@ def or_multiway(mult):
     # opportunity to learn about reduce (otherwise known as fold) if you
     # haven't seen it before :).
     return reduce(lambda base, bit: base | bit, mult, Bit(0))
+
+def multimux_multiway(sel, *m_list):
+    "Takes a variable number of Multi instances (must be a power of two) and returns the Multi instance indicated by the selector"
+    log = int(math.log(len(m_list), 2))
+    assert len(sel) == log, "sel must be {0} bits".format(log)
+    assert len(m_list) in [2**i for i in range(16)], "The list of variables must be a power of two"
+
+    def reduce_winner(sel, winner_list):
+        if len(winner_list) == 1:
+            return winner_list[0]
+        pow_two = int(math.log(len(winner_list), 2))
+        curr_sel = sel[-pow_two]
+        return reduce_winner(sel, [multimux(winner_list[i], winner_list[i + pow_two], curr_sel)
+                                    for i, m in enumerate(winner_list)
+                                    if (i + pow_two) < len(winner_list)])
+
+    return Multi(reduce_winner(sel, m_list))
+
+def dmux_multiway(mult, sel):
+    "Takes an input and a selector and returns a list of Bits where the sel Bit = input, and all others Bits = 0"
+    num_outputs = 2**len(sel)
+
+    def expand_winner(winner_list, s):
+        if len(winner_list) == num_outputs:
+            return winner_list
+        if len(winner_list) == 1:
+            index = 0
+        else:
+            index = int(math.log(len(winner_list), 2))
+        winners = [dmux(winner, s[index]) for winner in winner_list] # Split winners using dmux
+        winners = [instance for sublist in winners for instance in sublist] # Collapse list
+        return expand_winner(winners, s)
+
+    return expand_winner(mult, sel)

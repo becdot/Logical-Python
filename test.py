@@ -1,5 +1,6 @@
 from bit import Bit, nand, mux, dmux
-from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway
+from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway,\
+        multimux_multiway, dmux_multiway
 from ALU import *
 
 import unittest
@@ -186,22 +187,22 @@ class TestLogic(unittest.TestCase):
         one4 = Multi([zero, zero, zero, one])
         zero4 = Multi([zero, zero, zero, zero])
 
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(one4))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(zero4))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
-                                                      m_fifteen, m_fourteen)), str(m_eight))
-        self.assertEquals(str(Multi.multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
+        self.assertEquals(str(multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
+        self.assertEquals(str(multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(one4))
+        self.assertEquals(str(multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(zero4))
+        self.assertEquals(str(multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
+                                                m_fifteen, m_fourteen)), str(m_eight))
+        self.assertEquals(str(multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
                                                       m_fifteen, m_fourteen)), str(m_fourteen))
 
     def test_dmux_multiway(self):
         m_one = Multi([one])
         m_zero = Multi([zero])
 
-        a = Multi.dmux_multiway(m_one, m_zero)
-        b = Multi.dmux_multiway(m_one, Multi([zero, one]))
-        c = Multi.dmux_multiway(m_one, Multi([one, one]))
-        d = Multi.dmux_multiway(m_one, Multi([zero, one, one]))
+        a = dmux_multiway(m_one, m_zero)
+        b = dmux_multiway(m_one, Multi([zero, one]))
+        c = dmux_multiway(m_one, Multi([one, one]))
+        d = dmux_multiway(m_one, Multi([zero, one, one]))
         
         self.assertEquals([str(bit) for bit in a], [str(Multi([one])), str(Multi([zero]))])
         self.assertEquals([str(bit) for bit in b], [str(Multi([zero])), str(Multi([one])), str(Multi([zero])), str(Multi([zero]))])
