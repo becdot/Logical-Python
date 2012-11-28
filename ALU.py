@@ -20,11 +20,13 @@ def full_adder(b1, b2, b3):
     return (sum, carry)
 
 def add_multi(m1, m2):
-    m1, m2 = m1.pad_to_digits(m2, 16)
-    carry = half_adder(m1[-1], m2[-1])[1]
-
-    s = []
-    for i in range(len(m1) - 1):
-        carry = full_adder(m1[i], m2[i], carry)[1]
-        s.append(full_adder(m1[i + 1], m2[i + 1], carry)[0])
-    return Multi(s)
+    "Adds two Multi instances by doing partial adds of the individual bits (indexed from the right), and returns a 16-bit Multi instance"
+    m1, m2 = Multi.pad_to_digits(m1, 16, m2)
+    first_sum = half_adder(m1[15], m2[15])[0]
+    s = [first_sum]
+    for i in range(15, -1, -1):
+        carry = half_adder(m1[i], m2[i])[1]
+        sum = full_adder(m1[i - 1], m2[i - 1], carry)[0]
+        s.append(sum)
+    s.reverse()
+    return Multi(s[1:]) # cut out the overflow

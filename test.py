@@ -252,10 +252,15 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(s)
         self.assertTrue(c)
 
-    # def test_add_multi(self):
-    #     self.assertEquals(str(add_multi(m_zero, m_one)), str(one16))
-    #     self.assertEquals(str(add_multi(m_fourteen, m_one)), str(fifteen16))
-    #     self.assertEquals(str(add_multi(m_three, m_three)), str(Multi(one, one, zero)))
+    def test_add_multi(self):
+        m_37460  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, zero])
+        m_37461  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, one])
+
+        self.assertEquals(str(add_multi(m_one, m_37460)), str(m_37461))
+        self.assertEquals(str(add_multi(m_zero, m_one)), str(one16))
+        self.assertEquals(str(add_multi(m_fourteen, m_one)), str(fifteen16))
+        self.assertEquals(str(add_multi(m_three, m_three)), 
+            str(Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, zero])))
 
 
 
