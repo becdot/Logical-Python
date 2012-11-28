@@ -97,21 +97,28 @@ class TestLogic(unittest.TestCase):
         "Checks the comparison operators (>, <, etc) on Multi instances"
 
         self.assertTrue(m_one > m_zero)
+        self.assertTrue(m_zero > neg_four)
         self.assertTrue(m_eight >= one16)
         self.assertTrue(m_fifteen != m_fourteen)
+        self.assertTrue(m_eight != neg_eight)
         self.assertTrue(m_three == three16)
         self.assertTrue(m_three == Multi([one, one]))
         self.assertTrue(zero16 < m_one)
+        self.assertTrue(neg_two < neg_one)        
         self.assertTrue(m_fourteen <= m_16384)
+        self.assertTrue(neg_four <= neg_one)        
 
 
     def test_Multi_to_decimel(self):
         "Binary -> decimel"
-        "TODO -- check against negative numbers"
         self.assertEquals(Multi.to_decimel(m_fifteen), 15)
         self.assertEquals(Multi.to_decimel(m_eight), 8)
         self.assertEquals(Multi.to_decimel(m_one), 1)
         self.assertEquals(Multi.to_decimel(m_zero), 0)
+        self.assertEquals(Multi.to_decimel(neg_one), -1)
+        self.assertEquals(Multi.to_decimel(neg_two), -2)
+        self.assertEquals(Multi.to_decimel(neg_three), -3)
+        self.assertEquals(Multi.to_decimel(neg_four), -4)
 
 
     def test_Multi_pad(self):
@@ -287,12 +294,6 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(inc(m_zero)), str(one16))
         self.assertEquals(str(inc(m_three)), str(four16))
 
-    def test_negative_to_decimel(self):
-
-        self.assertEquals(Multi.to_decimel(neg_one), -1)
-        self.assertEquals(Multi.to_decimel(neg_two), -2)
-        self.assertEquals(Multi.to_decimel(neg_three), -3)
-        self.assertEquals(Multi.to_decimel(neg_four), -4)
 
 
 
