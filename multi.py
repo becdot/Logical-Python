@@ -8,7 +8,10 @@ class Multi:
 
     def __init__(self, bit_list):
         "Multi is a list of Bits"
-        self.value = bit_list[:]
+        # As it turns out, this is a better method, because it would allow
+        # a generator to be passed in as bit_list -- a slice fails on a
+        # generator.
+        self.value = [bit for bit in bit_list]
 
     def __len__(self):
         return len(self.value)
