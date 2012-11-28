@@ -58,34 +58,9 @@ class Multi:
 
         return Multi(Bit(int(digit)) for digit in bnum[b:])
 
-    def pad_multi(self, mult):
-        "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
-        if len(self) - len(mult) == 0:
-            return (self, mult)
-        longest = Multi(max(self, mult, key=len))
-        shortest = Multi(min(self, mult, key=len))
-        diff = len(longest) - len(shortest)
-        for i in range(diff):
-            shortest.value.insert(0, Bit(0))
-        assert len(longest) == len(shortest)
-
-        if longest == self:
-            return (longest, shortest)
-        return (shortest, longest)
-
-    def pad_to_digits(self, digits, *mult):
-        """Takes two Multi arrays and pads them to a specified number of digits
-            If both instances have the same length, will return (m1, m2) unchanged. If a Multi instance is longer than the number of digits, 
-            will return (m1, m2) unchanged"""
-        m = [Multi(m) for m in mult]
-        m.insert(0, Multi(self))
-        base = Multi([Bit(0) for digit in range(digits)])
-        pad_m = [base.pad_multi(instance)[1] for instance in m]
-        return (pad_m)
- 
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
-        m1, m2 = self.pad_multi(mult)
+        m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] & pair[1]) for pair in zip(m1.value, m2.value))
 
     def __invert__(self):
@@ -94,12 +69,12 @@ class Multi:
 
     def __or__(self, mult):
         "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
-        m1, m2 = self.pad_multi(mult)
+        m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
 
     def multimux(self, mult, sel):
         "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
-        a, b = self.pad_multi(mult)
+        a, b = pad_multi(self, mult)
         return Multi(mux(pair[0], pair[1], sel) for pair in zip(a.value, b.value))
 
     def or_multiway(self):
@@ -143,3 +118,33 @@ class Multi:
             return expand_winner(winners, s)
 
         return expand_winner(self, sel)
+
+
+# I would move these outside of Multi for reasons similar to mux and dmux.
+# I like the idea of having data -- Bits and Multis -- and then having
+# a set of functions that operate on that data. (Others may disagree.)
+def pad_multi(mult1, mult2):
+    "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
+    if len(mult1) - len(mult2) == 0:
+        return (mult1, mult2)
+    longest = Multi(max(mult1, mult2, key=len))
+    shortest = Multi(min(mult1, mult2, key=len))
+    diff = len(longest) - len(shortest)
+    for i in range(diff):
+        shortest.value.insert(0, Bit(0))
+    assert len(longest) == len(shortest)
+
+    if longest == mult1:
+        return (longest, shortest)
+    return (shortest, longest)
+
+
+def pad_to_digits(mult1, digits, *mult):
+    """Takes two Multi arrays and pads them to a specified number of digits
+        If both instances have the same length, will return (m1, m2) unchanged. If a Multi instance is longer than the number of digits, 
+        will return (m1, m2) unchanged"""
+    m = [Multi(m) for m in mult]
+    m.insert(0, Multi(mult1))
+    base = Multi([Bit(0) for digit in range(digits)])
+    pad_m = [pad_multi(base, instance)[1] for instance in m]
+    return (pad_m)
