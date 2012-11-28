@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway,\
         multimux_multiway, dmux_multiway
-from ALU import *
+from ALU import half_adder, full_adder, add_multi, inc
 
 import unittest
 
@@ -18,9 +18,12 @@ m_zero = Multi([zero])
 zero16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero])
 one16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one])
 three16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one])
+four16 = pad_to_digits(16, Multi([one, zero, zero]))[0]
 eight16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero, zero, zero])
 fourteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, zero])
 fifteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, one])
+m_37460  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, zero])
+m_37461  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, one])
 
 
 class TestLogic(unittest.TestCase):
@@ -112,12 +115,12 @@ class TestLogic(unittest.TestCase):
         zero4 = Multi([zero, zero, zero, zero])
         one4 = Multi([zero, zero, zero, one])
 
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_eight, 4, m_one)]), (str(m_eight), str(one4)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_one, 4, m_eight)]), (str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_zero, 3, m_one)]), (str(zero3), str(m_one)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4, m_zero)]), (str(three4), str(zero4)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_one, 1, m_zero)]), (str(m_one), str(m_zero)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4, m_one)]), (str(three4), str(one4)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_eight, m_one)]), (str(m_eight), str(one4)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_one, m_eight)]), (str(one4), str(m_eight)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(3, m_zero, m_one)]), (str(zero3), str(m_one)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three, m_zero)]), (str(three4), str(zero4)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(1, m_one, m_zero)]), (str(m_one), str(m_zero)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three, m_one)]), (str(three4), str(one4)))
 
     def test_Multi_pad_to_digits_with_variable_inputs(self):
         """Checks that Multi arrays are padded to the specified number of digits, instances of equal length are returned unchanged,
@@ -128,13 +131,13 @@ class TestLogic(unittest.TestCase):
         zero4 = Multi([zero, zero, zero, zero])
         one4 = Multi([zero, zero, zero, one])
 
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_zero, 3)]), (str(zero3),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4)]), (str(three4),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_one, 1)]), (str(m_one),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_three, 4)]), (str(three4),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_zero, 4, m_one, m_eight)]), (str(zero4), str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_eight, 4, m_one, m_eight)]), (str(m_eight), str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(m_fourteen, 4, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(3, m_zero)]), (str(zero3),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three)]), (str(three4),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(1, m_one)]), (str(m_one),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three)]), (str(three4),))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_zero, m_one, m_eight)]), (str(zero4), str(one4), str(m_eight)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_eight, m_one, m_eight)]), (str(m_eight), str(one4), str(m_eight)))
+        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_fourteen, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
 
     def test_Multi_and(self):
         "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"
@@ -225,6 +228,7 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(c)
 
     def test_full_adder(self):
+
         s, c = full_adder(zero, zero, zero)
         self.assertFalse(s)
         self.assertFalse(c)
@@ -251,15 +255,19 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(c)
 
     def test_add_multi(self):
-        m_37460  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, zero])
-        m_37461  = Multi([one, zero, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, one])
 
+        self.assertEquals(str(add_multi(m_one, m_three)), str(four16))
         self.assertEquals(str(add_multi(m_one, m_37460)), str(m_37461))
         self.assertEquals(str(add_multi(m_zero, m_one)), str(one16))
         self.assertEquals(str(add_multi(m_fourteen, m_one)), str(fifteen16))
         self.assertEquals(str(add_multi(m_three, m_three)), 
             str(Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, zero])))
 
+    def test_inc(self):
+
+        self.assertEquals(str(inc(m_37460)), str(m_37461))
+        self.assertEquals(str(inc(m_zero)), str(one16))
+        self.assertEquals(str(inc(m_three)), str(four16))
 
 
 

@@ -10,3 +10,4 @@ To-do:
 -  Make Multi instances index from the right?
    - Does halfadder need to index from the right
 -  Define multimux_multiway as a reduce function?
+- Create a truncate function that chops off the extra zeroes on the left?

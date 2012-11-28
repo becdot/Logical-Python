@@ -85,12 +85,11 @@ def pad_multi(mult1, mult2):
         return (longest, shortest)
     return (shortest, longest)
 
-def pad_to_digits(mult1, digits, *mult):
+def pad_to_digits(digits, *mult):
     """Takes two Multi arrays and pads them to a specified number of digits
         If both instances have the same length, will return (m1, m2) unchanged. If a Multi instance is longer than the number of digits, 
         will return (m1, m2) unchanged"""
     m = [Multi(m) for m in mult]
-    m.insert(0, Multi(mult1))
     base = Multi(Bit(0) for digit in range(digits))
     pad_m = [pad_multi(base, instance)[1] for instance in m]
     return pad_m

@@ -21,12 +21,16 @@ def full_adder(b1, b2, b3):
 
 def add_multi(m1, m2):
     "Adds two Multi instances by doing partial adds of the individual bits (indexed from the right), and returns a 16-bit Multi instance"
-    m1, m2 = pad_to_digits(m1, 16, m2)
-    first_sum = half_adder(m1[15], m2[15])[0]
-    s = [first_sum]
-    for i in range(15, -1, -1):
-        carry = half_adder(m1[i], m2[i])[1]
-        sum = full_adder(m1[i - 1], m2[i - 1], carry)[0]
+    m1, m2 = pad_to_digits(16, m1, m2)
+    sum, carry = half_adder(m1[15], m2[15])
+    s = [sum]
+    for i in range(14, -1, -1):
+        sum = full_adder(m1[i], m2[i], carry)[0] # disjointed so that sum can use the old carry value instead of the new one
+        carry = full_adder(m1[i], m2[i], carry)[1]
         s.append(sum)
-    s.reverse()
-    return Multi(s[1:]) # cut out the overflow
+    return Multi(reversed(s))
+
+def inc(m):
+    "Increases a Multi instance and returns a 16-bit value"
+    m, one = pad_to_digits(16, m, Multi([Bit(1)]))
+    return add_multi(m, one)
