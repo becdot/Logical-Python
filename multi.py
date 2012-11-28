@@ -78,7 +78,7 @@ class Multi:
 # a set of functions that operate on that data. (Others may disagree.)
 def pad_multi(mult1, mult2):
     "Takes two Multi arrays and pads the shorter one with Bit(0) -- only works for positive numbers"
-    if len(mult1) - len(mult2) == 0:
+    if len(mult1) == len(mult2):
         return (mult1, mult2)
     longest = Multi(max(mult1, mult2, key=len))
     shortest = Multi(min(mult1, mult2, key=len))
@@ -98,9 +98,9 @@ def pad_to_digits(mult1, digits, *mult):
         will return (m1, m2) unchanged"""
     m = [Multi(m) for m in mult]
     m.insert(0, Multi(mult1))
-    base = Multi([Bit(0) for digit in range(digits)])
+    base = Multi(Bit(0) for digit in range(digits))
     pad_m = [pad_multi(base, instance)[1] for instance in m]
-    return (pad_m)
+    return pad_m
 
 
 def multimux(mult1, mult2, sel):
@@ -115,6 +115,7 @@ def or_multiway(mult):
     # opportunity to learn about reduce (otherwise known as fold) if you
     # haven't seen it before :).
     return reduce(lambda base, bit: base | bit, mult, Bit(0))
+
 
 def multimux_multiway(sel, *m_list):
     "Takes a variable number of Multi instances (must be a power of two) and returns the Multi instance indicated by the selector"
