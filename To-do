@@ -13,3 +13,5 @@ To-do:
 -  Define multimux_multiway as a reduce function?
 - Create a truncate function that chops off the extra zeroes on the left?
 - Why can't Multi[i] == (1 or True) evaluate correctly?  (in to_decimel)
+- Enable flag in to_decimel for number of digits
+- Overload + operator instead of add_multi

@@ -41,6 +41,9 @@ class Multi:
     def __ne__(self, mult):
         return self.to_decimel() != mult.to_decimel()
 
+    def insert(self, index, value):
+        self.value.insert(index, value)
+    
     def to_decimel(self):
         """Converts a Multi instance to a decimel representation
             A Multi instance is negative if Multi[0] = 1 and len(Multi) > 4"""

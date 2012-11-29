@@ -1,5 +1,5 @@
 from bit import Bit
-from multi import Multi, pad_to_digits
+from multi import Multi, pad_to_digits, multimux, or_multiway
 
 import itertools
 
@@ -39,14 +39,35 @@ def inc(m):
     return add_multi(m, one)
 
 def from_num(num):
-    "Enables construction of a 16-bit Multi instance using a number"
+    "Helper function to create a 16-bit Multi instance using a number"
     bnum = bin(num)
     b = bnum.index('b') + 1
-    pos = Multi(Bit(int(digit)) for digit in bnum[b:])
+    pos = Multi(Bit(digit) for digit in bnum[b:])
+    pos.insert(0, Bit(0))
     pos = pad_to_digits(16, pos)[0]
     if bnum[0] == '-':
         neg = inc(~pos)
         if len(neg) > 16:
             return neg[1:]
-        return neg
-    return pos
+        return Multi(neg)
+    return Multi(pos)
+
+def alu(x, y, zx, nx, zy, ny, f, no):
+    """Calculates a variety of functions on x and y, determined by the combination of control bits
+        Outputs (out, zr, ng) where out is the 16-bit Multi result, and zr and ng are single Bits"""
+    
+    neg_one = Multi(Bit(digit) for digit in '1111111111111111')
+    #import pdb; pdb.set_trace()
+
+    zero_x = x & Multi(~Bit(zx) for bit in range(16))
+    zero_y = y & Multi(~Bit(zy) for bit in range(16))
+    x2 = multimux(zero_x, ~zero_x, nx)
+    y2 = multimux(zero_y, ~zero_y, ny)
+    f_xy = multimux(x2 & y2, add_multi(x2, y2), f)
+    out = multimux(f_xy, ~f_xy, no)
+    zr = ~(or_multiway(out))
+    ng = out[0]
+
+    return (out, zr, ng)
+
+

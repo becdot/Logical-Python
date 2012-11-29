@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway,\
         multimux_multiway, dmux_multiway
-from ALU import half_adder, full_adder, add_multi, inc, from_num
+from ALU import half_adder, full_adder, add_multi, inc, from_num, alu
 
 import unittest
 
@@ -22,13 +22,13 @@ neg_three = Multi(Bit(digit) for digit in '1111111111111101')
 neg_four = Multi(Bit(digit) for digit in '1111111111111100')
 neg_eight = Multi(Bit(digit) for digit in '1111111111111000')
 neg_fourteen = Multi(Bit(digit) for digit in '1111111111100100')
-neg_fifteen = pad_to_digits(16, from_num(-15))[0]
+neg_fifteen = from_num(-15)
 
 zero16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero])
 one16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one])
 two16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero])
 three16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one])
-four16 = pad_to_digits(16, Multi([one, zero, zero]))[0]
+four16 = from_num(4)
 eight16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero, zero, zero])
 fourteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, zero])
 fifteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, one])
@@ -211,7 +211,7 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(eight16 & neg_eight), str(eight16))
         self.assertEquals(str(eight16 & neg_four), str(eight16))
         self.assertEquals(str(zero16 & neg_one), str(zero16))
-        self.assertEquals(str(neg_three & m_fourteen), str(pad_to_digits(16, from_num(12))[0]))
+        self.assertEquals(str(neg_three & m_fourteen), str(from_num(12)))
         self.assertEquals(str(neg_one & neg_three), str(neg_three))
 
     def test_Multi_not(self):
@@ -223,9 +223,9 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(~m_one), str(Multi([one, one, zero])))
         self.assertEquals(str(~m_zero), str(Multi([one])))
 
-        self.assertEquals(str(~neg_one), str(Multi([pad_to_digits(16, from_num(0))][0])))
-        self.assertEquals(str(~neg_four), str(Multi([pad_to_digits(16, from_num(3))][0])))
-        self.assertEquals(str(~neg_two), str(Multi([pad_to_digits(16, from_num(1))][0])))
+        self.assertEquals(str(~neg_one), str(from_num(0)))
+        self.assertEquals(str(~neg_four), str(from_num(3)))
+        self.assertEquals(str(~neg_two), str(from_num(1)))
 
     def test_Multi_or(self):
         "Checks that multibit | returns the correct value of positive and negative Multi arrays"
@@ -365,6 +365,56 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(inc(neg_one)), str(zero16))
         self.assertEquals(str(inc(neg_three)), str(neg_two))
 
+    def test_alu(self):
+        x = zero16
+        y = neg_one
+        
+        self.assertEquals([str(bit) for bit in alu(x, y, one, zero, one, zero, one, zero)], [str(zero16), str(one), str(zero)]) # 0
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, one, one, one, one)], [str(one16), str(zero), str(zero)]) # 1
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, one, zero, one, zero)], [str(neg_one), str(zero), str(one)]) # -1
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, zero, zero)], [str(zero16), str(one), str(zero)]) # x
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, zero, zero)], [str(neg_one), str(zero), str(one)]) # y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, zero, one)], [str(neg_one), str(zero), str(one)]) # ~x
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, zero, one)], [str(zero16), str(one), str(zero)]) # ~y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, one, one)], [str(zero16), str(one), str(zero)]) # -x
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, one, one)], [str(one16), str(zero), str(zero)]) # -y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, one, one, one, one, one)], [str(one16), str(zero), str(zero)]) # x + 1
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, one, one, one)], [str(zero16), str(one), str(zero)]) # y + 1
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, one, zero)], [str(neg_one), str(zero), str(one)]) # x - 1
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, one, zero)], [str(neg_two), str(zero), str(one)]) # y - 1
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, zero, one, zero)], [str(neg_one), str(zero), str(one)]) # x + y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, one, zero, zero, one, one)], [str(one16), str(zero), str(zero)]) # x - y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, one, one, one)], [str(neg_one), str(zero), str(one)]) # y - x
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, zero, zero, zero)], [str(zero16), str(one), str(zero)]) # x & y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, one, zero, one, zero, one)], [str(neg_one), str(zero), str(one)]) # x | y
+
+        x = Multi(from_num(17))
+        y = three16
+
+        self.assertEquals([str(bit) for bit in alu(x, y, one, zero, one, zero, one, zero)], [str(zero16), str(one), str(zero)]) # 0
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, one, one, one, one)], [str(one16), str(zero), str(zero)]) # 1
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, one, zero, one, zero)], [str(neg_one), str(zero), str(one)]) # -1
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, zero, zero)], [str(x), str(zero), str(zero)]) # x
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, zero, zero)], [str(y), str(zero), str(zero)]) # y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, zero, one)], [str(~x), str(zero), str(one)]) # ~x
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, zero, one)], [str(~y), str(zero), str(one)]) # ~y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, one, one)], [str(from_num(-17)), 
+                                                                                                str(zero), str(one)]) # -x
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, one, one)], [str(neg_three), str(zero), str(one)]) # -y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, one, one, one, one, one)], [str(inc(x)), str(zero), str(zero)]) # x + 1
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, one, one, one)], [str(inc(y)), str(zero), str(zero)]) # y + 1
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, one, one, one, zero)], [str(from_num(16)), 
+                                                                                                str(zero), str(zero)]) # x - 1
+        self.assertEquals([str(bit) for bit in alu(x, y, one, one, zero, zero, one, zero)], [str(two16), str(zero), str(zero)]) # y - 1
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, zero, one, zero)], [str(from_num(20)),
+                                                                                                str(zero), str(zero)]) # x + y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, one, zero, zero, one, one)], [str(from_num(14)), 
+                                                                                                str(zero), str(zero)]) # x - y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, one, one, one)], [str(from_num(-14)), 
+                                                                                            str(zero), str(one)]) # y - x
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, zero, zero, zero)], [str(one16), str(zero), str(zero)]) # x & y
+        self.assertEquals([str(bit) for bit in alu(x, y, zero, one, zero, one, zero, one)], [str(from_num(19)),
+                                                                                            str(zero), str(zero)]) # x | y
 
 
 
