@@ -12,6 +12,7 @@ m_fifteen = Multi([one, one, one, one])
 m_fourteen = Multi([one, one, one, zero])
 m_eight = Multi([one, zero, zero, zero])
 m_three = Multi([one, one])
+m_two = Multi([zero, one, zero])
 m_one = Multi([zero, zero, one])
 m_zero = Multi([zero])
 
@@ -25,6 +26,7 @@ neg_fifteen = pad_to_digits(16, from_num(-15))[0]
 
 zero16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero])
 one16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one])
+two16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero])
 three16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one])
 four16 = pad_to_digits(16, Multi([one, zero, zero]))[0]
 eight16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero, zero, zero])
@@ -196,8 +198,7 @@ class TestLogic(unittest.TestCase):
         self.assertEquals([str(m) for m in pad_to_digits(6, neg_two8, neg_three8, zero4)], [str(neg_two8), str(neg_three8), str(zero6)])
 
     def test_Multi_and(self):
-        "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"
-        "Tested with negative numbers"
+        "Checks that the multibit & returns the correct values of positive and negative Multi arrays of different sizes"
 
         zero4 = Multi([zero, zero, zero, zero])
         two4 = Multi([zero, zero, one, zero])
@@ -214,7 +215,7 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(neg_one & neg_three), str(neg_three))
 
     def test_Multi_not(self):
-        "Checks that the multibit ~ flips all the signs of a Multi array"
+        "Checks that the multibit ~ flips all the signs of a positive and negative Multi array"
 
         self.assertEquals(str(~m_fifteen), str(Multi([zero, zero, zero, zero])))
         self.assertEquals(str(~m_eight), str(Multi([zero, one, one, one])))
@@ -222,8 +223,12 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(~m_one), str(Multi([one, one, zero])))
         self.assertEquals(str(~m_zero), str(Multi([one])))
 
+        self.assertEquals(str(~neg_one), str(Multi([pad_to_digits(16, from_num(0))][0])))
+        self.assertEquals(str(~neg_four), str(Multi([pad_to_digits(16, from_num(3))][0])))
+        self.assertEquals(str(~neg_two), str(Multi([pad_to_digits(16, from_num(1))][0])))
+
     def test_Multi_or(self):
-        "Checks that multibit | returns the correct value and pads Multi arrays of different sizes appropriately"
+        "Checks that multibit | returns the correct value of positive and negative Multi arrays"
 
         self.assertEquals(str(m_eight | m_zero), str(m_eight))
         self.assertEquals(str(m_eight | m_one), str(Multi([one, zero, zero, one])))
@@ -231,7 +236,14 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(m_three | m_one), str(Multi([zero, one, one])))
         self.assertEquals(str(m_one | m_fourteen), str(m_fifteen))
 
+        self.assertEquals(str(neg_eight | m_zero), str(neg_eight))
+        self.assertEquals(str(m_eight | neg_one), str(neg_one))
+        self.assertEquals(str(neg_two | neg_three), str(neg_one))
+        self.assertEquals(str(neg_eight | neg_three), str(neg_three))
+        self.assertEquals(str(neg_two | m_two), str(neg_two))
+
     def test_multimux(self):
+        "Checks that multimux(a, b) -> a if sel = 0, and b if sel = 1"
 
         zero3 = Multi([zero, zero, zero])
 
@@ -239,28 +251,39 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(multimux(m_eight, m_fifteen, one)), str(m_fifteen))
         self.assertEquals(str(multimux(m_zero, m_one, zero)), str(zero3))
         self.assertEquals(str(multimux(m_zero, m_one, one)), str(m_one))
+        self.assertEquals(str(multimux(neg_one, m_zero, zero)), str(neg_one))
+        self.assertEquals(str(multimux(m_eight, neg_two, one)), str(neg_two))
+        self.assertEquals(str(multimux(m_zero, neg_one, zero)), str(zero16))
+        self.assertEquals(str(multimux(neg_one, m_one, one)), str(one16))
 
     def test_or_multiway(self):
+        "Checks that or_multiway returns 1 if any bits in the number = 1, and 0 only if all bits = 0"
 
-        self.assertTrue(str(or_multiway(m_eight)))
-        self.assertTrue(str(or_multiway(m_fifteen)))
-        self.assertTrue(str(or_multiway(m_one)))
-        self.assertTrue(str(or_multiway(m_zero)))
+        self.assertTrue(or_multiway(m_eight))
+        self.assertTrue(or_multiway(neg_three))
+        self.assertTrue(or_multiway(m_one))
+        self.assertTrue(or_multiway(neg_one))
+        self.assertFalse(or_multiway(m_zero))
 
     def test_multimux_multiway(self):
+        """Checks that multimux_multiway returns the correct value given an input of 2, 4, or 8 Multi instances 
+            and a corresponding selector of 1, 2, or 3 digits"""
 
         one4 = Multi([zero, zero, zero, one])
         zero4 = Multi([zero, zero, zero, zero])
 
         self.assertEquals(str(multimux_multiway(Multi([one]), m_fifteen, m_fourteen)), str(m_fourteen))
-        self.assertEquals(str(multimux_multiway(Multi([one, one]), m_fifteen, m_fourteen, m_zero, m_one)), str(one4))
-        self.assertEquals(str(multimux_multiway(Multi([zero, one]), m_three, m_zero, m_fifteen, m_fourteen)), str(zero4))
-        self.assertEquals(str(multimux_multiway(Multi([one, zero, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
-                                                m_fifteen, m_fourteen)), str(m_eight))
+        self.assertEquals(str(multimux_multiway(Multi([zero]), neg_one, m_fourteen)), str(neg_one))
+        self.assertEquals(str(multimux_multiway(Multi([one, one]), m_fifteen, neg_two, m_zero, m_one)), str(one16))
+        self.assertEquals(str(multimux_multiway(Multi([zero, one]), m_zero, neg_one, m_two, neg_three)), str(neg_one))
+        self.assertEquals(str(multimux_multiway(Multi([one, zero, zero]), m_zero, neg_one, m_fourteen, neg_eight, m_one, m_zero, 
+                                                m_fifteen, neg_three)), str(neg_eight))
         self.assertEquals(str(multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
                                                       m_fifteen, m_fourteen)), str(m_fourteen))
 
     def test_dmux_multiway(self):
+        """Checks that dmux_multiway returns the number of outputs indicated by the selector (1 -> 2, 2 -> 4, 3 -> 8), and sets the  
+        Multi instance indicated by the selector equal to the input, and all other outputs zero"""
         m_one = Multi([one])
         m_zero = Multi([zero])
 
@@ -268,14 +291,17 @@ class TestLogic(unittest.TestCase):
         b = dmux_multiway(m_one, Multi([zero, one]))
         c = dmux_multiway(m_one, Multi([one, one]))
         d = dmux_multiway(m_one, Multi([zero, one, one]))
+        e = dmux_multiway(m_zero, Multi([one, one]))
         
         self.assertEquals([str(bit) for bit in a], [str(Multi([one])), str(Multi([zero]))])
         self.assertEquals([str(bit) for bit in b], [str(Multi([zero])), str(Multi([one])), str(Multi([zero])), str(Multi([zero]))])
         self.assertEquals([str(bit) for bit in c], [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([one]))])
         self.assertEquals([str(bit) for bit in d], [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([one])), 
                                                     str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([zero]))])
+        self.assertEquals([str(bit) for bit in e], [str(Multi([zero])), str(Multi([zero])), str(Multi([zero])), str(Multi([zero]))])
 
     def test_half_adder(self):
+        "Checks that the addition of 2 Bits will return the appropriate (sum, carry) bits"
         s, c = half_adder(zero, zero)
         self.assertFalse(s)
         self.assertFalse(c)
@@ -290,7 +316,7 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(c)
 
     def test_full_adder(self):
-
+        "Checks that the addition of 3 Bits will return the appropriate (sum, carry) bits"
         s, c = full_adder(zero, zero, zero)
         self.assertFalse(s)
         self.assertFalse(c)
@@ -317,19 +343,27 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(c)
 
     def test_add_multi(self):
+        """Tests that the addition of two Multi instances return the correct 16-bit instance
+            If the output has an overflow (beyond 16 bits) it is ignored"""
+        six16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, zero])
 
         self.assertEquals(str(add_multi(m_one, m_three)), str(four16))
         self.assertEquals(str(add_multi(m_one, m_16384)), str(m_16385))
         self.assertEquals(str(add_multi(m_zero, m_one)), str(one16))
         self.assertEquals(str(add_multi(m_fourteen, m_one)), str(fifteen16))
-        self.assertEquals(str(add_multi(m_three, m_three)), 
-            str(Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, zero])))
-
+        self.assertEquals(str(add_multi(m_three, m_three)), str(six16))
+        self.assertEquals(str(add_multi(neg_eight, Multi([zero, zero, one, zero, one]))), str(neg_three))
+        self.assertEquals(str(add_multi(four16, neg_two)), str(two16))
+        self.assertEquals(str(add_multi(m_zero, neg_one)), str(neg_one))        
+        self.assertEquals(str(add_multi(neg_two, two16)), str(zero16))
+        
     def test_inc(self):
-
+        "Checks that inc(Multi) increases the value by 1"
         self.assertEquals(str(inc(m_16384)), str(m_16385))
         self.assertEquals(str(inc(m_zero)), str(one16))
         self.assertEquals(str(inc(m_three)), str(four16))
+        self.assertEquals(str(inc(neg_one)), str(zero16))
+        self.assertEquals(str(inc(neg_three)), str(neg_two))
 
 
 

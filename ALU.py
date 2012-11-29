@@ -28,6 +28,9 @@ def add_multi(m1, m2):
         sum = full_adder(m1[i], m2[i], carry)[0] # disjointed so that sum can use the old carry value instead of the new one
         carry = full_adder(m1[i], m2[i], carry)[1]
         s.append(sum)
+    if len(s) > 16:
+        assert len(s[1:]) == 16
+        return Multi(reversed(s[1:]))
     return Multi(reversed(s))
 
 def inc(m):
