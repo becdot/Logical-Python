@@ -96,7 +96,7 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(b)
 
     def test_Multi_comparison(self):
-        "Checks the comparison operators (>, <, etc) on Multi instances"
+        "Checks the comparison operators (>, <, etc) on both positive and negative Multi instances"
 
         self.assertTrue(m_one > m_zero)
         self.assertTrue(m_zero > neg_four)
@@ -112,7 +112,7 @@ class TestLogic(unittest.TestCase):
 
 
     def test_Multi_to_decimel(self):
-        "Binary -> decimel"
+        "Binary -> decimel for both positive and negative numbers"
         self.assertEquals(Multi.to_decimel(m_fifteen), 15)
         self.assertEquals(Multi.to_decimel(m_eight), 8)
         self.assertEquals(Multi.to_decimel(m_one), 1)
@@ -124,7 +124,13 @@ class TestLogic(unittest.TestCase):
 
 
     def test_Multi_pad(self):
-        "Checks that Multi instances of uneven length are padded appropriately, and that instances of equal length are returned unchanged"
+        """Checks that positive and negative Multi instances of uneven length are padded appropriately.
+            Also checks that instances of equal length are returned unchanged"""
+
+        neg_one5 = Multi([one, one, one, one, one])
+        neg_two6 = Multi([one, one, one, one, one, zero])
+        neg_three8 = Multi([one, one, one, one, one, one, zero, one])
+
 
         self.assertEquals(tuple([str(m) for m in pad_multi(m_one, m_zero)]), (str(m_one), str(Multi([zero, zero, zero]))))
         self.assertEquals(tuple([str(m) for m in pad_multi(m_zero, m_one)]), (str(Multi([zero, zero, zero])), str(m_one)))
@@ -133,21 +139,14 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(tuple([str(m) for m in pad_multi(m_eight, m_one)]), (str(m_eight), str(Multi([zero, zero, zero, one]))))
         self.assertEquals(tuple([str(m) for m in pad_multi(m_fourteen, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
 
-    def test_Multi_pad_to_digits_with_two_inputs(self):
-        """Checks that Multi arrays are padded to the specified number of digits, instances of equal length are returned unchanged,
-        and that a digit that is too low will return the original Multi instances"""
-
-        three4 = Multi([zero, zero, one, one])
-        zero3 = Multi([zero, zero, zero])
-        zero4 = Multi([zero, zero, zero, zero])
-        one4 = Multi([zero, zero, zero, one])
-
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_eight, m_one)]), (str(m_eight), str(one4)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_one, m_eight)]), (str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(3, m_zero, m_one)]), (str(zero3), str(m_one)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three, m_zero)]), (str(three4), str(zero4)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(1, m_one, m_zero)]), (str(m_one), str(m_zero)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three, m_one)]), (str(three4), str(one4)))
+        self.assertEquals(tuple([str(m) for m in pad_multi(neg_one5, m_zero)]), (str(neg_one5), str(Multi([zero, zero, zero, zero, zero]))))
+        self.assertEquals(tuple([str(m) for m in pad_multi(m_zero, neg_one5)]), (str(Multi([zero, zero, zero, zero, zero])), str(neg_one5)))
+        self.assertEquals(tuple([str(m) for m in pad_multi(neg_three8, neg_one5)]), (str(neg_three8), 
+                                                                                    str(Multi([one, one, one, one, one, one, one, one]))))
+        self.assertEquals(tuple([str(m) for m in pad_multi(neg_two6, neg_three8)]), (str(Multi([one, one, one, one, one, one, one, zero])), 
+                                                                                    str(Multi([one, one, one, one, one, one, zero, one]))))
+        self.assertEquals(tuple([str(m) for m in pad_multi(neg_two6, m_fourteen)]), (str(neg_two6), 
+                                                                                    str(Multi([zero, zero, one, one, one, zero]))))
 
     def test_Multi_pad_to_digits_with_variable_inputs(self):
         """Checks that Multi arrays are padded to the specified number of digits, instances of equal length are returned unchanged,
@@ -157,14 +156,44 @@ class TestLogic(unittest.TestCase):
         zero3 = Multi([zero, zero, zero])
         zero4 = Multi([zero, zero, zero, zero])
         one4 = Multi([zero, zero, zero, one])
+        eight6 = Multi([zero, zero, one, zero, zero, zero])
+        one6 = Multi([zero, zero, zero, zero, zero, one])
+        zero6 = Multi([zero, zero, zero, zero, zero, zero])
+        zero8 = Multi([zero, zero, zero, zero, zero, zero, zero, zero])
+        three6 = Multi([zero, zero, zero, zero, one, one])
+        neg_one5 = Multi([one, one, one, one, one])
+        neg_one6 = Multi([one, one, one, one, one, one])
+        neg_one8 = Multi([one, one, one, one, one, one, one, one])
+        neg_two6 = Multi([one, one, one, one, one, zero])
+        neg_two8 = Multi([one, one, one, one, one, one, one, zero])
+        neg_three8 = Multi([one, one, one, one, one, one, zero, one])
 
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(3, m_zero)]), (str(zero3),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three)]), (str(three4),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(1, m_one)]), (str(m_one),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_three)]), (str(three4),))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_zero, m_one, m_eight)]), (str(zero4), str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_eight, m_one, m_eight)]), (str(m_eight), str(one4), str(m_eight)))
-        self.assertEquals(tuple([str(m) for m in pad_to_digits(4, m_fourteen, m_fifteen)]), (str(m_fourteen), str(m_fifteen)))
+        # Checks output with two positive inputs
+        self.assertEquals([str(m) for m in pad_to_digits(4, m_eight, m_one)], [str(m_eight), str(one4)])
+        self.assertEquals([str(m) for m in pad_to_digits(4, m_one, m_eight)], [str(one4), str(m_eight)])
+        self.assertEquals([str(m) for m in pad_to_digits(6, m_eight, m_one)], [str(eight6), str(one6)])
+        self.assertEquals([str(m) for m in pad_to_digits(6, m_one, m_eight)], [str(one6), str(eight6)])
+        self.assertEquals([str(m) for m in pad_to_digits(3, m_zero, m_one)], [str(zero3), str(m_one)])
+        self.assertEquals([str(m) for m in pad_to_digits(4, m_three, m_zero)], [str(three4), str(zero4)])
+        self.assertEquals([str(m) for m in pad_to_digits(1, m_one, m_zero)], [str(m_one), str(m_zero)])
+        self.assertEquals([str(m) for m in pad_to_digits(4, m_three, m_one)], [str(three4), str(one4)])
+        # Checks output with variable positive inputs
+        self.assertEquals([str(m) for m in pad_to_digits(6, m_zero)], [str(zero6)])
+        self.assertEquals([str(m) for m in pad_to_digits(4, m_three)], [str(three4)])
+        self.assertEquals([str(m) for m in pad_to_digits(1, m_one)], [str(m_one)])
+        self.assertEquals([str(m) for m in pad_to_digits(4, m_zero, m_one, m_eight)], [str(zero4), str(one4), str(m_eight)])
+        self.assertEquals([str(m) for m in pad_to_digits(4, zero3, m_three, m_eight)], [str(zero4), str(three4), str(m_eight)])
+        self.assertEquals([str(m) for m in pad_to_digits(6, m_eight, m_three, m_eight)], [str(eight6), str(three6), str(eight6)])
+        # Checks output with negative inputs
+        self.assertEquals([str(m) for m in pad_to_digits(6, neg_one5)], [str(neg_one6)])
+        self.assertEquals([str(m) for m in pad_to_digits(8, neg_two6)], [str(neg_two8)])
+        self.assertEquals([str(m) for m in pad_to_digits(1, neg_three)], [str(neg_three)])
+        self.assertEquals([str(m) for m in pad_to_digits(8, m_zero, neg_two8, neg_one5)], [str(zero8), str(neg_two8), str(neg_one8)])
+        self.assertEquals([str(m) for m in pad_to_digits(6, zero3, neg_one6, m_eight)], [str(zero6), str(neg_one6), str(eight6)])
+        # Checks output with a digit that is lower than one or many Multi instances
+        self.assertEquals([str(m) for m in pad_to_digits(6, m_eight, zero4, neg_two8)], [str(eight6), str(zero6), str(neg_two8)])
+        self.assertEquals([str(m) for m in pad_to_digits(6, neg_two8, m_eight, zero4)], [str(neg_two8), str(eight6), str(zero6)])
+        self.assertEquals([str(m) for m in pad_to_digits(6, neg_two8, neg_three8, zero4)], [str(neg_two8), str(neg_three8), str(zero6)])
 
     def test_Multi_and(self):
         "Checks that the multibit & returns the correct values and pads Multi arrays of different sizes appropriately"

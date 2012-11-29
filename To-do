@@ -2,6 +2,7 @@ To-do:
 
 -  Figure out how to represent negative binary values
    - pos and neg subclass of Multi?
+   - signed and unsigned subclass of Multi?
 - Enable multidmux (currently can only accept a one-bit input)?
 -  Take out unnecessary functions (comparisons?)
 -  Find a better way to test equality in test.py, rather than having str(Multi) all over the place
