@@ -57,7 +57,6 @@ def alu(x, y, zx, nx, zy, ny, f, no):
         Outputs (out, zr, ng) where out is the 16-bit Multi result, and zr and ng are single Bits"""
     
     neg_one = Multi(Bit(digit) for digit in '1111111111111111')
-    #import pdb; pdb.set_trace()
 
     zero_x = x & Multi(~Bit(zx) for bit in range(16))
     zero_y = y & Multi(~Bit(zy) for bit in range(16))

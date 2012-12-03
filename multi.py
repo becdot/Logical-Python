@@ -4,7 +4,7 @@ import math
 
 
 class Multi:
-    "TODO -- negative Multibit values are not handled properly"
+    "A class composed of one or more Bits"
 
     def __init__(self, bit_list):
         "Multi is a list of Bits"
@@ -22,18 +22,6 @@ class Multi:
 
     def __getitem__(self, index):
         return self.value[index]
-
-    def __lt__(self, mult):
-        return self.to_decimel() < mult.to_decimel()
-
-    def __le__(self, mult):
-        return self.to_decimel() <= mult.to_decimel()
-
-    def __gt__(self, mult):
-        return self.to_decimel() > mult.to_decimel()
-
-    def __ge__(self, mult):
-        return self.to_decimel() >= mult.to_decimel()
 
     def __eq__(self, mult):
         return self.to_decimel() == mult.to_decimel()

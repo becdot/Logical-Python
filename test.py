@@ -97,20 +97,20 @@ class TestLogic(unittest.TestCase):
         self.assertFalse(a)
         self.assertTrue(b)
 
-    def test_Multi_comparison(self):
-        "Checks the comparison operators (>, <, etc) on both positive and negative Multi instances"
+    # def test_Multi_comparison(self):
+    #     "Checks the comparison operators (>, <, etc) on both positive and negative Multi instances"
 
-        self.assertTrue(m_one > m_zero)
-        self.assertTrue(m_zero > neg_four)
-        self.assertTrue(m_eight >= one16)
-        self.assertTrue(m_fifteen != m_fourteen)
-        self.assertTrue(m_eight != neg_eight)
-        self.assertTrue(m_three == three16)
-        self.assertTrue(m_three == Multi([one, one]))
-        self.assertTrue(zero16 < m_one)
-        self.assertTrue(neg_two < neg_one)        
-        self.assertTrue(m_fourteen <= m_16384)
-        self.assertTrue(neg_four <= neg_one)        
+    #     self.assertTrue(m_one > m_zero)
+    #     self.assertTrue(m_zero > neg_four)
+    #     self.assertTrue(m_eight >= one16)
+    #     self.assertTrue(m_fifteen != m_fourteen)
+    #     self.assertTrue(m_eight != neg_eight)
+    #     self.assertTrue(m_three == three16)
+    #     self.assertTrue(m_three == Multi([one, one]))
+    #     self.assertTrue(zero16 < m_one)
+    #     self.assertTrue(neg_two < neg_one)        
+    #     self.assertTrue(m_fourteen <= m_16384)
+    #     self.assertTrue(neg_four <= neg_one)        
 
 
     def test_Multi_to_decimel(self):
