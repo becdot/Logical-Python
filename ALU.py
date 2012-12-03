@@ -1,5 +1,5 @@
 from bit import Bit
-from multi import Multi, pad_to_digits, multimux, or_multiway
+from multi import Multi, multimux, or_multiway, pad_to_digits
 
 import itertools
 
@@ -37,20 +37,6 @@ def inc(m):
     "Increases a Multi instance and returns a 16-bit value"
     m, one = pad_to_digits(16, m, Multi([Bit(1)]))
     return add_multi(m, one)
-
-def from_num(num):
-    "Helper function to create a 16-bit Multi instance using a number"
-    bnum = bin(num)
-    b = bnum.index('b') + 1
-    pos = Multi(Bit(digit) for digit in bnum[b:])
-    pos.insert(0, Bit(0))
-    pos = pad_to_digits(16, pos)[0]
-    if bnum[0] == '-':
-        neg = inc(~pos)
-        if len(neg) > 16:
-            return neg[1:]
-        return Multi(neg)
-    return Multi(pos)
 
 def alu(x, y, zx, nx, zy, ny, f, no):
     """Calculates a variety of functions on x and y, determined by the combination of control bits

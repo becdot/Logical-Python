@@ -20,21 +20,22 @@ class Multi:
         for bit in self.value:
             yield bit
 
-    def __getitem__(self, index):
-        return self.value[index]
-
     def __eq__(self, mult):
         return self.to_decimel() == mult.to_decimel()
 
     def __ne__(self, mult):
         return self.to_decimel() != mult.to_decimel()
 
+    def __getitem__(self, index):
+        return self.value[index]
+
     def insert(self, index, value):
         self.value.insert(index, value)
+
     
     def to_decimel(self):
         """Converts a Multi instance to a decimel representation
-            A Multi instance is negative if Multi[0] = 1 and len(Multi) > 4"""
+            A Multi instance is negative if Multi[0] = 1 AND len(Multi) > 4"""
         if len(self) > 4 and int(self[0]) == 1:
             LSB_sum = sum((bit * 2**i) for i, bit in enumerate(reversed(self.value[1:])))
             MSB = -1 * 2 ** (len(self) - 1)
@@ -54,34 +55,6 @@ class Multi:
         "Overloads the | operator so that out[0] = (a[0] | b[0]), etc"
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] | pair[1]) for pair in zip(m1.value, m2.value))
-
-
-def pad_multi(mult1, mult2):
-    "Takes two Multi arrays and pads the shorter one with Bit(0) if it is a negative number, and Bit(1) if it is negative"
-    if len(mult1) == len(mult2):
-        return (mult1, mult2)
-    longest = Multi(max(mult1, mult2, key=len))
-    shortest = Multi(min(mult1, mult2, key=len))
-    diff = len(longest) - len(shortest)
-    for i in range(diff):
-        if shortest.to_decimel() < 0:
-            shortest.value.insert(0, Bit(1))
-        else:
-            shortest.value.insert(0, Bit(0))
-    assert len(longest) == len(shortest)
-
-    if longest == mult1:
-        return (longest, shortest)
-    return (shortest, longest)
-
-def pad_to_digits(digits, *mult):
-    """Takes a variable number of Multi arrays and pads them to a specified number of digits
-        If both instances have the same length, will return [m1...] unchanged. If a Multi instance is longer than the number of digits, 
-        will return [m1...] unchanged"""
-    m = [Multi(m) for m in mult]
-    base = Multi(Bit(0) for digit in range(digits))
-    pad_m = [pad_multi(base, instance)[1] for instance in m]
-    return pad_m
 
 def multimux(mult1, mult2, sel):
     "Takes two Multi instances and a 1-Bit sel and returns m1 if sel = 0 and m2 if sel = 1"
@@ -125,3 +98,37 @@ def dmux_multiway(mult, sel):
         return expand_winner(winners, s)
 
     return expand_winner(mult, sel)
+
+
+def pad_multi(mult1, mult2):
+    """Takes two Multi arrays and pads the shorter one with Bit(0) if it is a negative number, and Bit(1) if it is negative
+    Returns the instances in the order in which they were entered"""
+    if len(mult1) == len(mult2):
+        return (mult1, mult2)
+    longest = Multi(max(mult1, mult2, key=len))
+    shortest = Multi(min(mult1, mult2, key=len))
+    diff = len(longest) - len(shortest)
+    for i in range(diff):
+        if shortest.to_decimel() < 0:
+            shortest.value.insert(0, Bit(1))
+        else:
+            shortest.value.insert(0, Bit(0))
+    assert len(longest) == len(shortest)
+
+    if longest == mult1:
+        return (longest, shortest)
+    return (shortest, longest)
+
+def pad_to_digits(digits, *mult):
+    """Takes a variable number of Multi arrays and pads them to a specified number of digits
+        If all instances have the same length, will return [m1, m2...] unchanged. 
+        If a Multi instance is longer than the number of digits, will throw an exception"""
+    padded = []
+    compare = Multi(Bit(0) for digit in range(digits))
+    for m in mult:
+        if len(m) > digits:
+            raise ValueError('{} has more than {} digits'.format(str(m), digits))
+        else:
+            pad_m = pad_multi(compare, Multi(m))[1]
+            padded.append(pad_m)
+    return padded

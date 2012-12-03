@@ -1,12 +1,25 @@
 from bit import Bit, nand, mux, dmux
-from multi import Multi, pad_multi, pad_to_digits, multimux, or_multiway,\
-        multimux_multiway, dmux_multiway
-from ALU import half_adder, full_adder, add_multi, inc, from_num, alu
+from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
+from ALU import half_adder, full_adder, add_multi, inc, alu
 
 import unittest
 
 zero = Bit(0)
 one = Bit(1)
+
+def from_num(num):
+    "Helper function to create a 16-bit Multi instance using a number"
+    bnum = bin(num)
+    b = bnum.index('b') + 1
+    pos = Multi(Bit(digit) for digit in bnum[b:])
+    pos.insert(0, Bit(0))
+    pos = pad_to_digits(16, pos)[0]
+    if bnum[0] == '-':
+        neg = inc(~pos)
+        if len(neg) > 16:
+            return neg[1:]
+        return Multi(neg)
+    return Multi(pos)
 
 m_fifteen = Multi([one, one, one, one])
 m_fourteen = Multi([one, one, one, zero])
@@ -22,18 +35,20 @@ neg_three = Multi(Bit(digit) for digit in '1111111111111101')
 neg_four = Multi(Bit(digit) for digit in '1111111111111100')
 neg_eight = Multi(Bit(digit) for digit in '1111111111111000')
 neg_fourteen = Multi(Bit(digit) for digit in '1111111111100100')
-neg_fifteen = from_num(-15)
+neg_fifteen = Multi(Bit(digit) for digit in '1111111111110001')
 
 zero16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero])
 one16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one])
 two16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero])
 three16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one])
-four16 = from_num(4)
+four16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero, zero])
 eight16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, zero, zero, zero])
 fourteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, zero])
 fifteen16 = Multi([zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, zero, one, one, one, one])
 m_16384  = Multi([zero, one, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, zero])
 m_16385  = Multi([zero, one, zero, one, zero, zero, one, zero, zero, one, zero, one, zero, one, zero, one])
+
+
 
 
 class TestLogic(unittest.TestCase):
@@ -97,22 +112,14 @@ class TestLogic(unittest.TestCase):
         self.assertFalse(a)
         self.assertTrue(b)
 
-    # def test_Multi_comparison(self):
-    #     "Checks the comparison operators (>, <, etc) on both positive and negative Multi instances"
+    def test_Multi_comparison(self):
+        "Checks the comparison operators (>, <, etc) on both positive and negative Multi instances"
 
-    #     self.assertTrue(m_one > m_zero)
-    #     self.assertTrue(m_zero > neg_four)
-    #     self.assertTrue(m_eight >= one16)
-    #     self.assertTrue(m_fifteen != m_fourteen)
-    #     self.assertTrue(m_eight != neg_eight)
-    #     self.assertTrue(m_three == three16)
-    #     self.assertTrue(m_three == Multi([one, one]))
-    #     self.assertTrue(zero16 < m_one)
-    #     self.assertTrue(neg_two < neg_one)        
-    #     self.assertTrue(m_fourteen <= m_16384)
-    #     self.assertTrue(neg_four <= neg_one)        
-
-
+        self.assertTrue(m_fifteen != m_fourteen)
+        self.assertTrue(m_eight != neg_eight)
+        self.assertTrue(m_three == three16)
+        self.assertTrue(m_three == Multi([one, one]))
+      
     def test_Multi_to_decimel(self):
         "Binary -> decimel for both positive and negative numbers"
         self.assertEquals(Multi.to_decimel(m_fifteen), 15)
@@ -123,7 +130,6 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(Multi.to_decimel(neg_two), -2)
         self.assertEquals(Multi.to_decimel(neg_three), -3)
         self.assertEquals(Multi.to_decimel(neg_four), -4)
-
 
     def test_Multi_pad(self):
         """Checks that positive and negative Multi instances of uneven length are padded appropriately.
@@ -177,26 +183,25 @@ class TestLogic(unittest.TestCase):
         self.assertEquals([str(m) for m in pad_to_digits(6, m_one, m_eight)], [str(one6), str(eight6)])
         self.assertEquals([str(m) for m in pad_to_digits(3, m_zero, m_one)], [str(zero3), str(m_one)])
         self.assertEquals([str(m) for m in pad_to_digits(4, m_three, m_zero)], [str(three4), str(zero4)])
-        self.assertEquals([str(m) for m in pad_to_digits(1, m_one, m_zero)], [str(m_one), str(m_zero)])
         self.assertEquals([str(m) for m in pad_to_digits(4, m_three, m_one)], [str(three4), str(one4)])
+        # Checks that an exception is raised if digits is lower than the length of one or more Multi instances
+        self.assertRaises(ValueError, pad_to_digits, *(1, m_one, m_zero))
+        self.assertRaises(ValueError, pad_to_digits, *(1, neg_three))
+        self.assertRaises(ValueError, pad_to_digits, *(6, m_eight, zero4, neg_two8))
+        self.assertRaises(ValueError, pad_to_digits, *(6, neg_two8, m_eight, zero4))
+        self.assertRaises(ValueError, pad_to_digits, *(6, neg_two8, neg_three8, zero4))
         # Checks output with variable positive inputs
         self.assertEquals([str(m) for m in pad_to_digits(6, m_zero)], [str(zero6)])
         self.assertEquals([str(m) for m in pad_to_digits(4, m_three)], [str(three4)])
-        self.assertEquals([str(m) for m in pad_to_digits(1, m_one)], [str(m_one)])
         self.assertEquals([str(m) for m in pad_to_digits(4, m_zero, m_one, m_eight)], [str(zero4), str(one4), str(m_eight)])
         self.assertEquals([str(m) for m in pad_to_digits(4, zero3, m_three, m_eight)], [str(zero4), str(three4), str(m_eight)])
         self.assertEquals([str(m) for m in pad_to_digits(6, m_eight, m_three, m_eight)], [str(eight6), str(three6), str(eight6)])
         # Checks output with negative inputs
         self.assertEquals([str(m) for m in pad_to_digits(6, neg_one5)], [str(neg_one6)])
         self.assertEquals([str(m) for m in pad_to_digits(8, neg_two6)], [str(neg_two8)])
-        self.assertEquals([str(m) for m in pad_to_digits(1, neg_three)], [str(neg_three)])
         self.assertEquals([str(m) for m in pad_to_digits(8, m_zero, neg_two8, neg_one5)], [str(zero8), str(neg_two8), str(neg_one8)])
         self.assertEquals([str(m) for m in pad_to_digits(6, zero3, neg_one6, m_eight)], [str(zero6), str(neg_one6), str(eight6)])
-        # Checks output with a digit that is lower than one or many Multi instances
-        self.assertEquals([str(m) for m in pad_to_digits(6, m_eight, zero4, neg_two8)], [str(eight6), str(zero6), str(neg_two8)])
-        self.assertEquals([str(m) for m in pad_to_digits(6, neg_two8, m_eight, zero4)], [str(neg_two8), str(eight6), str(zero6)])
-        self.assertEquals([str(m) for m in pad_to_digits(6, neg_two8, neg_three8, zero4)], [str(neg_two8), str(neg_three8), str(zero6)])
-
+        
     def test_Multi_and(self):
         "Checks that the multibit & returns the correct values of positive and negative Multi arrays of different sizes"
 
