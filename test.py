@@ -1,6 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
 from ALU import half_adder, full_adder, add_multi, inc, alu
+from sequential import SR, FF, DFF
 
 import unittest
 
@@ -420,7 +421,54 @@ class TestLogic(unittest.TestCase):
         self.assertEquals([str(bit) for bit in alu(x, y, zero, zero, zero, zero, zero, zero)], [str(one16), str(zero), str(zero)]) # x & y
         self.assertEquals([str(bit) for bit in alu(x, y, zero, one, zero, one, zero, one)], [str(from_num(19)),
                                                                                             str(zero), str(zero)]) # x | y
+    def test_sr(self):
+        """Implements an SR gate(s, r) whereby:
+        SR(0, 0) -> Q (hold pattern)
+        SR(0, 1) -> 0 (reset)
+        SR(1, 0) -> 1 (set)
+        SR(1, 1) -> not allowed"""
 
+        sr = SR()
+        self.assertFalse(sr(zero, zero))
+        self.assertFalse(sr(zero, one))
+        self.assertTrue(sr(one, zero))
+        self.assertTrue(sr(zero, zero))
+        self.assertTrue(sr(zero, zero))
+        self.assertFalse(sr(zero, one))
+        self.assertFalse(sr(zero, zero))
+
+    def test_FF(self):
+        """FF(0, 0) -> Q (hold)
+        FF(0, 1) -> 0 (reset)
+        FF(1, 0) -> Q (hold)
+        FF(1, 1) -> 1 (set)"""
+
+        ff = FF()
+        self.assertFalse(ff(zero, zero))
+        self.assertFalse(ff(zero, one))
+        self.assertFalse(ff(one, zero))
+        self.assertTrue(ff(one, one))
+        self.assertTrue(ff(zero, zero))
+        self.assertTrue(ff(one, zero))
+        self.assertFalse(ff(zero, one))
+        self.assertFalse(ff(zero, zero))
+
+    def test_DFF(self):
+        """FF(0, 0) -> Q (hold)
+        FF(0, 1) -> 0 (reset)
+        FF(1, 0) -> Q (hold)
+        FF(1, 1) -> 1 (set)"""
+
+        dff = DFF()
+        self.assertFalse(dff(zero, zero)) #(0, 0)
+        self.assertFalse(dff(zero, one)) #(0, 0)
+        self.assertFalse(dff(one, zero)) #(0, 0)
+        self.assertFalse(dff(one, one)) #(1, 0)
+        self.assertTrue(dff(one, zero)) #(1, 1)
+        self.assertTrue(dff(zero, zero)) #(1, 1)
+        self.assertTrue(dff(zero, one)) #(0, 1)
+        # self.assertFalse(dff(one, one)) #(1, 0)
+        # self.assertTrue(dff(zero, zero)) #(1, 1)
 
 
 if __name__ == "__main__":
