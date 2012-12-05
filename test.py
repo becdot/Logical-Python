@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
 from ALU import half_adder, full_adder, add_multi, inc, alu
-from sequential import SR, FF, DFF, SingleRegister, Register
+from sequential import SR, FF, DFF, SingleRegister, Register, RAM8
 
 import unittest
 
@@ -283,7 +283,7 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(multimux_multiway(Multi([one, one]), m_fifteen, neg_two, m_zero, m_one)), str(one16))
         self.assertEquals(str(multimux_multiway(Multi([zero, one]), m_zero, neg_one, m_two, neg_three)), str(neg_one))
         self.assertEquals(str(multimux_multiway(Multi([one, zero, zero]), m_zero, neg_one, m_fourteen, neg_eight, m_one, m_zero, 
-                                                m_fifteen, neg_three)), str(neg_eight))
+                                                m_fifteen, neg_three)), str(one16))
         self.assertEquals(str(multimux_multiway(Multi([zero, one, zero]), m_zero, m_three, m_fourteen, m_eight, m_one, m_zero, 
                                                       m_fifteen, m_fourteen)), str(m_fourteen))
 
@@ -517,8 +517,33 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(reg(neg_one, one, one)), str(neg_eight))
         self.assertEquals(str(reg(neg_one, one, zero)), str(neg_one))
 
-    
+    def test_RAM8(self):
+        ram = RAM8()
+        zero3 = Multi([zero, zero, zero])
+        one3 = Multi([zero, zero, one])
+        three3 = Multi([zero, one, one])
+        four3 = Multi([one, zero, zero])
 
+        self.assertEquals(str(ram(zero16, zero, zero3, one)), str(zero16))
+        self.assertEquals(str(ram(zero16, zero, zero3, zero)), str(zero16))
+        self.assertEquals(str(ram(zero16, one, zero3, one)), str(zero16))
+        self.assertEquals(str(ram(zero16, one, zero3, zero)), str(zero16))
+        self.assertEquals(str(ram(neg_one, one, one3, one)), str(zero16))
+        self.assertEquals(str(ram(neg_one, one, one3, zero)), str(neg_one))
+        self.assertEquals(str(ram(neg_one, zero, zero3, one)), str(zero16))
+        self.assertEquals(str(ram(neg_one, zero, zero3, zero)), str(zero16))
+        self.assertEquals(str(ram(three16, zero, three3, one)), str(zero16))
+        self.assertEquals(str(ram(three16, zero, three3, zero)), str(zero16))
+        self.assertEquals(str(ram(three16, one, three3, one)), str(zero16))
+        self.assertEquals(str(ram(three16, one, three3, zero)), str(three16))
+        self.assertEquals(str(ram(three16, zero, three3, one)), str(three16))
+        self.assertEquals(str(ram(three16, zero, three3, zero)), str(three16))
+        self.assertEquals(str(ram(three16, zero, one3, one)), str(neg_one))
+        self.assertEquals(str(ram(three16, zero, one3, zero)), str(neg_one))
+        self.assertEquals(str(ram(four16, zero, one3, one)), str(neg_one))
+        self.assertEquals(str(ram(four16, zero, one3, zero)), str(neg_one))
+        self.assertEquals(str(ram(four16, one, four3, one)), str(zero16))
+        self.assertEquals(str(ram(four16, one, four3, zero)), str(four16))
 
 
 

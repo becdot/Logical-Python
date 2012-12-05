@@ -76,14 +76,17 @@ def multimux_multiway(sel, *m_list):
             return winner_list[0]
         pow_two = int(math.log(len(winner_list), 2))
         curr_sel = sel[-pow_two]
-        return reduce_winner(sel, [multimux(winner_list[i], winner_list[i + pow_two], curr_sel)
+
+
+        return reduce_winner(sel, [multimux(winner_list[i], winner_list[i + 2**(pow_two - 1)], curr_sel)
                                     for i, m in enumerate(winner_list)
-                                    if (i + pow_two) < len(winner_list)])
+                                    if (i + 2**(pow_two - 1) < len(winner_list))])
 
     return Multi(reduce_winner(sel, m_list))
 
 def dmux_multiway(mult, sel):
-    "Takes an input and a selector and returns a list of Bits where the sel Bit = input, and all others Bits = 0"
+    """"Takes a selector and a single-bit Multi instance as input and returns a list of Bits. 
+        sel Bit = input, and all others Bits = 0"""
     num_outputs = 2**len(sel)
 
     def expand_winner(winner_list, s):

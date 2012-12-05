@@ -1,5 +1,5 @@
 from bit import Bit, mux
-from multi import Multi
+from multi import Multi, dmux_multiway, multimux_multiway
 
 zero = Bit(0)
 one = Bit(1)
@@ -70,6 +70,15 @@ class Register:
         self.reg = [SingleRegister() for i in range(16)]
     def __call__(self, multi, load, clock):
         return Multi(pair[0](pair[1], load, clock) for pair in zip(self.reg, multi))
+
+class RAM8:
+
+    def __init__(self):
+        self.reg = [Register() for i in range(8)]
+    def __call__(self, multi, load, address, clock):
+        inputs = dmux_multiway(Multi([load]), address)
+        regs = [Multi(pair[0](multi, pair[1], clock)) for pair in zip(self.reg, inputs)]
+        return multimux_multiway(address, *regs)
 
 
 
