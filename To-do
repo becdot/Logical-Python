@@ -1,10 +1,7 @@
 To-do:
 
--  Figure out how to represent negative binary values
-   - pos and neg subclass of Multi?
-   - signed and unsigned subclass of Multi?
+-  Find a better way to represent negative binary values?
 - Enable multidmux (currently can only accept a one-bit input)?
--  Take out unnecessary functions (comparisons?)
 -  Find a better way to test equality in test.py, rather than having str(Multi) all over the place
 -  Better formula for full_adder?
 -  Collapse full and half adders into one function?
@@ -12,6 +9,5 @@ To-do:
    - Does halfadder need to index from the right
 -  Define multimux_multiway as a reduce function?
 - Create a truncate function that chops off the extra zeroes on the left?
-- Why can't Multi[i] == (1 or True) evaluate correctly?  (in to_decimel)
-- Enable flag in to_decimel for number of digits
+- Enable flag in to_decimal for number of digits
 - Overload + operator instead of add_multi

@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
 from ALU import half_adder, full_adder, add_multi, inc, alu
-from sequential import SR, FF, DFF
+from sequential import SR, FF, DFF, SingleRegister
 
 import unittest
 
@@ -467,8 +467,38 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(dff(one, zero)) #(1, 1)
         self.assertTrue(dff(zero, zero)) #(1, 1)
         self.assertTrue(dff(zero, one)) #(0, 1)
-        # self.assertFalse(dff(one, one)) #(1, 0)
-        # self.assertTrue(dff(zero, zero)) #(1, 1)
+        self.assertFalse(dff(zero, zero)) #(0, 0)
+        self.assertFalse(dff(one, one)) #(1, 0)
+        self.assertTrue(dff(zero, zero)) #(1, 1)
+
+    def test_SingleRegister(self):
+        "DFF changes on the falling edge, instead of the rising edge"
+        bit = SingleRegister()
+
+        self.assertFalse(bit(zero, zero, one))
+        self.assertFalse(bit(zero, zero, zero))
+        self.assertFalse(bit(zero, one, one))
+        self.assertFalse(bit(zero, one, zero))
+        self.assertFalse(bit(one, zero, one))
+        self.assertFalse(bit(one, zero, zero))
+        self.assertFalse(bit(one, one, one))
+        self.assertTrue(bit(one, one, zero))
+        self.assertTrue(bit(zero, zero, one))
+        self.assertTrue(bit(zero, zero, zero))
+        self.assertTrue(bit(one, zero, one))
+        self.assertTrue(bit(one, zero, zero))
+        self.assertTrue(bit(zero, one, one))
+        self.assertFalse(bit(zero, one, zero))
+        self.assertFalse(bit(one, one, one))
+        self.assertTrue(bit(one, one, zero))
+        self.assertTrue(bit(zero, zero, one))
+        self.assertTrue(bit(zero, zero, zero))
+        self.assertTrue(bit(zero, one, one))
+        self.assertFalse(bit(zero, one, zero))
+
+
+
+
 
 
 if __name__ == "__main__":

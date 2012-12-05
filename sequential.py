@@ -1,4 +1,4 @@
-from bit import Bit
+from bit import Bit, mux
 
 zero = Bit(0)
 one = Bit(1)
@@ -9,8 +9,7 @@ class SR:
         SR(0, 1) -> 0 (reset)
         SR(1, 0) -> 1 (set)
         SR(1, 1) -> not allowed
-    self.q and self.nq are set to arbitrary numbers because the loop pattern of the SR gate 
-    ensures that they will change as appropriate"""
+    self.q and self.nq are set to arbitrary numbers because all inputs will stabilize via the looping pattern"""
 
     def __init__(self):
         self.q = zero
@@ -28,7 +27,7 @@ class FF:
         FF(0, 1) -> 0 (reset)
         FF(1, 0) -> Q (hold)
         FF(1, 1) -> 1 (set)
-    It is also implemented in such a way that SR can never be called with the disallowed input"""
+    It is also implemented in such a way that the SR gate can never be called with the disallowed (1, 1) input"""
 
     def __init__(self):
         self.sr = SR()
@@ -38,7 +37,8 @@ class FF:
         return self.sr(s, r)
 
 class DFF:
-    "Implements a DFF gate where two FF's are chained asynchronously together so that slave -> master output of previous cycle"
+    """Implements a DFF gate where the slave -> master output of previous cycle
+        Change occurs on the FALLING edge of the clock (i.e. 1 -> 0)"""
     def __init__(self):
         self.master = FF()
         self.slave = FF()
@@ -46,4 +46,19 @@ class DFF:
         master_q = self.master(data, clock)
         slave_q = self.slave(master_q, ~clock)
         return slave_q
+
+class SingleRegister:
+
+    def __init__(self):
+        self.dff = DFF()
+        self.value = zero
+    def __call__(self, bit, load, clock):
+        initial_mux = mux(self.value, bit, load)
+        self.value = self.dff(initial_mux, clock)
+        return self.value
+
+
+
+
+
 
