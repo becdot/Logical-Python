@@ -72,7 +72,7 @@ class Register:
         return Multi(pair[0](pair[1], load, clock) for pair in zip(self.reg, multi))
 
 class RAM8:
-
+    "Collection of 8 registers -- takes a 3-bit address"
     def __init__(self):
         self.reg = [Register() for i in range(8)]
     def __call__(self, multi, load, address, clock):
@@ -80,7 +80,18 @@ class RAM8:
         regs = [Multi(pair[0](multi, pair[1], clock)) for pair in zip(self.reg, inputs)]
         return multimux_multiway(address, *regs)
 
+class RAM64:
+    "Collection of 64 Registers -- takes a 6-bit address"
 
+    def __init__(self):
+        self.reg = [RAM8() for i in range(8)]
+    def __call__(self, multi, load, address, clock):
+        input_address = Multi(address[-1:-4:-1])
+        reg_address = Multi(address[-4:-7:-1])
+        
+        inputs = dmux_multiway(Multi([load]), input_address)
+        regs = [Multi(pair[0](multi, pair[1], reg_address, clock)) for pair in zip(self.reg, inputs)]        
+        return multimux_multiway(input_address, *regs)
 
 
 

@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
 from ALU import half_adder, full_adder, add_multi, inc, alu
-from sequential import SR, FF, DFF, SingleRegister, Register, RAM8
+from sequential import SR, FF, DFF, SingleRegister, Register, RAM8, RAM64
 
 import unittest
 
@@ -545,7 +545,35 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(ram(four16, one, four3, one)), str(zero16))
         self.assertEquals(str(ram(four16, one, four3, zero)), str(four16))
 
+    def test_RAM64(self):
+        ram = RAM64()
+        zero6 = Multi([zero, zero, zero, zero, zero, zero])
+        thirteen6 = Multi([zero, zero, one, one, zero, one])
+        fortyseven6 = Multi([one, zero, one, one, one, one])
+        sixtythree6 = Multi([one, one, one, one, one, one])
 
+        self.assertEquals(str(ram(zero16, zero, zero6, one)), str(zero16))
+        self.assertEquals(str(ram(zero16, zero, zero6, zero)), str(zero16))
+        self.assertEquals(str(ram(zero16, one, zero6, one)), str(zero16))
+        self.assertEquals(str(ram(zero16, one, zero6, zero)), str(zero16))
+        self.assertEquals(str(ram(from_num(13), zero, zero6, one)), str(zero16))
+        self.assertEquals(str(ram(from_num(13), zero, zero6, zero)), str(zero16))
+        self.assertEquals(str(ram(from_num(13), one, thirteen6, one)), str(zero16))
+        self.assertEquals(str(ram(from_num(13), one, thirteen6, zero)), str(from_num(13)))
+        self.assertEquals(str(ram(from_num(13), zero, zero6, one)), str(zero16))
+        self.assertEquals(str(ram(from_num(13), zero, zero6, zero)), str(zero16))
+        self.assertEquals(str(ram(from_num(47), zero, fortyseven6, one)), str(zero16))
+        self.assertEquals(str(ram(from_num(47), zero, fortyseven6, zero)), str(zero16))
+        self.assertEquals(str(ram(from_num(47), one, fortyseven6, one)), str(zero16))
+        self.assertEquals(str(ram(from_num(47), one, fortyseven6, zero)), str(from_num(47)))
+        self.assertEquals(str(ram(from_num(47), zero, fortyseven6, one)), str(from_num(47)))
+        self.assertEquals(str(ram(from_num(47), zero, fortyseven6, zero)), str(from_num(47)))
+        self.assertEquals(str(ram(from_num(47), zero, fortyseven6, one)), str(from_num(47)))
+        self.assertEquals(str(ram(from_num(47), zero, thirteen6, zero)), str(from_num(13)))
+        self.assertEquals(str(ram(from_num(63), zero, thirteen6, one)), str(from_num(13)))
+        self.assertEquals(str(ram(from_num(63), zero, thirteen6, zero)), str(from_num(13)))
+        self.assertEquals(str(ram(from_num(63), one, sixtythree6, one)), str(zero16))
+        self.assertEquals(str(ram(from_num(63), one, sixtythree6, zero)), str(from_num(63)))
 
 
 if __name__ == "__main__":

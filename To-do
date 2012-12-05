@@ -11,3 +11,4 @@ To-do:
 - Create a truncate function that chops off the extra zeroes on the left?
 - Enable flag in to_decimal for number of digits
 - Overload + operator instead of add_multi
+- Build RAM more efficiently, abstract a little more, instead of just following the same process over and over again
