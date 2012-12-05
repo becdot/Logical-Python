@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
 from ALU import half_adder, full_adder, add_multi, inc, alu
-from sequential import SR, FF, DFF, SingleRegister
+from sequential import SR, FF, DFF, SingleRegister, Register
 
 import unittest
 
@@ -496,6 +496,28 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(bit(zero, one, one))
         self.assertFalse(bit(zero, one, zero))
 
+    def test_Register(self):
+        reg = Register()
+        self.assertEquals(str(reg(zero16, zero, one)), str(zero16))
+        self.assertEquals(str(reg(zero16, zero, zero)), str(zero16))
+        self.assertEquals(str(reg(zero16, one, one)), str(zero16))
+        self.assertEquals(str(reg(zero16, one, zero)), str(zero16))
+        self.assertEquals(str(reg(m_16384, zero, one)), str(zero16))
+        self.assertEquals(str(reg(m_16384, zero, zero)), str(zero16))
+        self.assertEquals(str(reg(m_16385, zero, one)), str(zero16))
+        self.assertEquals(str(reg(m_16385, zero, zero)), str(zero16))
+        self.assertEquals(str(reg(m_16384, one, one)), str(zero16))
+        self.assertEquals(str(reg(m_16384, one, zero)), str(m_16384))
+        self.assertEquals(str(reg(m_16384, zero, one)), str(m_16384))
+        self.assertEquals(str(reg(m_16384, zero, zero)), str(m_16384))
+        self.assertEquals(str(reg(neg_eight, one, one)), str(m_16384))
+        self.assertEquals(str(reg(neg_eight, one, zero)),str(neg_eight))
+        self.assertEquals(str(reg(neg_one, zero, one)), str(neg_eight))
+        self.assertEquals(str(reg(neg_one, zero, zero)), str(neg_eight))
+        self.assertEquals(str(reg(neg_one, one, one)), str(neg_eight))
+        self.assertEquals(str(reg(neg_one, one, zero)), str(neg_one))
+
+    
 
 
 

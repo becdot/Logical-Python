@@ -1,4 +1,5 @@
 from bit import Bit, mux
+from multi import Multi
 
 zero = Bit(0)
 one = Bit(1)
@@ -48,6 +49,9 @@ class DFF:
         return slave_q
 
 class SingleRegister:
+    """if load(t) = 1, out(t + 1) = in(t)
+        if load(t) = 0, out(t + 1) = out(t) (no change)
+        returns a single bit on the falling edge of the clock"""
 
     def __init__(self):
         self.dff = DFF()
@@ -56,6 +60,17 @@ class SingleRegister:
         initial_mux = mux(self.value, bit, load)
         self.value = self.dff(initial_mux, clock)
         return self.value
+
+class Register:
+    """if load(t) = 1, out(t + 1) = in(t)
+        if load(t) = 0, out(t + 1) = out(t) (no change)
+        returns a Multibit instance on the falling edge of the clock"""
+
+    def __init__(self):
+        self.reg = [SingleRegister() for i in range(16)]
+    def __call__(self, multi, load, clock):
+        return Multi(pair[0](pair[1], load, clock) for pair in zip(self.reg, multi))
+
 
 
 
