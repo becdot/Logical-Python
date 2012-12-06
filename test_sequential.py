@@ -236,33 +236,34 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(ram(from_num(500), one, fiveC, one)), str(zero16))
         self.assertEquals(str(ram(from_num(500), one, fiveC, zero)), str(from_num(500)))
 
-    def test_RAM4K(self):
-        "Takes a 12-bit address"
-        ram = RAM4K()
+    # RATHER SLOW
+    # def test_RAM4K(self):
+    #     "Takes a 12-bit address"
+    #     ram = RAM4K()
 
 
-        self.assertEquals(str(ram(zero16, zero, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(zero16, zero, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(zero16, one, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(zero16, one, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), zero, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), zero, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), one, oneC_12, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), one, oneC_12, zero)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(100), zero, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), zero, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(3000), zero, threeK, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(3000), zero, threeK, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(3000), one, threeK, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(3000), one, threeK, zero)), str(from_num(3000)))
-        self.assertEquals(str(ram(from_num(3000), zero, threeK, one)), str(from_num(3000)))
-        self.assertEquals(str(ram(from_num(3000), zero, threeK, zero)), str(from_num(3000)))
-        self.assertEquals(str(ram(from_num(3000), zero, threeK, one)), str(from_num(3000)))
-        self.assertEquals(str(ram(from_num(3000), zero, oneC_12, zero)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(4095), zero, oneC_12, one)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(4095), zero, oneC_12, zero)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, zero)), str(from_num(4095)))
+    #     self.assertEquals(str(ram(zero16, zero, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, zero, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, one, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, one, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), one, oneC_12, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), one, oneC_12, zero)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(3000), zero, threeK, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(3000), zero, threeK, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(3000), one, threeK, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(3000), one, threeK, zero)), str(from_num(3000)))
+    #     self.assertEquals(str(ram(from_num(3000), zero, threeK, one)), str(from_num(3000)))
+    #     self.assertEquals(str(ram(from_num(3000), zero, threeK, zero)), str(from_num(3000)))
+    #     self.assertEquals(str(ram(from_num(3000), zero, threeK, one)), str(from_num(3000)))
+    #     self.assertEquals(str(ram(from_num(3000), zero, oneC_12, zero)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(4095), zero, oneC_12, one)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(4095), zero, oneC_12, zero)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, zero)), str(from_num(4095)))
 
     # INCREDIBLY SLOW, be careful in uncommenting!
     # def test_RAM16K(self):
