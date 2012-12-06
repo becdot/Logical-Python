@@ -72,27 +72,55 @@ class Register:
     def __call__(self, multi, load, clock):
         return Multi(pair[0](pair[1], load, clock) for pair in zip(self.reg, multi))
 
-class RAM8:
-    "Collection of 8 registers -- takes a 3-bit address"
-    def __init__(self):
-        self.reg = [Register() for i in range(8)]
-    def __call__(self, multi, load, address, clock):
-        inputs = dmux_multiway(Multi([load]), address)
-        regs = [Multi(pair[0](multi, pair[1], clock)) for pair in zip(self.reg, inputs)]
-        return multimux_multiway(address, *regs)
 
-class RAM64:
-    "Collection of 64 Registers -- takes a 6-bit address"
+class RAM:
+    "Sets up the basic rules for a RAM block, that can be called with the name of a RAM type to build from (e.g. RAM64 -> RAM8)"
+
+    make_from = None
 
     def __init__(self):
-        self.reg = [RAM8() for i in range(8)]
-    def __call__(self, multi, load, address, clock):
-        input_address = Multi(address[3:6])
-        reg_address = Multi(address[0:3])
+        if not self.make_from:
+            raise Exception, "make_from is not defined" 
+        self.reg = [self.make_from() for i in range(8)]
 
+    def __call__(self, multi, load, address, clock):
+        input_address = Multi(address[-1:-4:-1])
+        reg_address = Multi(address[-4:-(len(address) + 1):-1])
         inputs = dmux_multiway(Multi([load]), input_address)
         regs = [Multi(pair[0](multi, pair[1], reg_address, clock)) for pair in zip(self.reg, inputs)]        
         return multimux_multiway(input_address, *regs)
+
+class RAM8(RAM):
+    "Block of 8 Registers that inherits from RAM. Takes a 3-bit address"
+    make_from = Register
+
+    def __call__(self, multi, load, address, clock):
+        inputs = dmux_multiway(Multi([load]), address)
+        regs = [Multi(pair[0](multi, pair[1], clock)) for pair in zip(self.reg, inputs)]
+        return multimux_multiway(address, *regs)        
+
+class RAM64(RAM):
+    "Block of 8 RAM8s that inherits from RAM. Takes a 6-bit address"
+    make_from = RAM8
+
+class RAM512(RAM):
+    "Block of 8 RAM64s that inherits from RAM. Takes a 9-bit address"
+    make_from = RAM64
+
+class RAM4K(RAM):
+    "Block of 8 RAM64s that inherits from RAM. Takes a 12-bit address"
+    make_from = RAM512
+
+class RAM16K(RAM):
+    "Block of 8 RAM4Ks that inherits from RAM. Takes a 14-bit address"
+    make_from = RAM4K
+    def __call__(self, multi, load, address, clock):
+        input_address = Multi(address[-1:-4:-1])
+        reg_address = Multi(address[-3:-(len(address) + 1):-1])
+        inputs = dmux_multiway(Multi([load]), input_address)
+        regs = [Multi(pair[0](multi, pair[1], reg_address, clock)) for pair in zip(self.reg, inputs)]        
+        return multimux_multiway(input_address, *regs)
+
 
 class PC:
     """ if reset(t-1):
