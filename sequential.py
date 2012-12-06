@@ -1,5 +1,6 @@
 from bit import Bit, mux
-from multi import Multi, dmux_multiway, multimux_multiway
+from multi import Multi, multimux, dmux_multiway, multimux_multiway
+from ALU import inc
 
 zero = Bit(0)
 one = Bit(1)
@@ -86,14 +87,36 @@ class RAM64:
     def __init__(self):
         self.reg = [RAM8() for i in range(8)]
     def __call__(self, multi, load, address, clock):
-        input_address = Multi(address[-1:-4:-1])
-        reg_address = Multi(address[-4:-7:-1])
-        
+        input_address = Multi(address[3:6])
+        reg_address = Multi(address[0:3])
+
         inputs = dmux_multiway(Multi([load]), input_address)
         regs = [Multi(pair[0](multi, pair[1], reg_address, clock)) for pair in zip(self.reg, inputs)]        
         return multimux_multiway(input_address, *regs)
 
+class PC:
+    """ if reset(t-1):
+            out(t) = 0
+        elif load(t-1):
+            out(t) = in(t-1)
+        elif inc(t-1):
+            out(t) = out(t-1) + 1 (integer addition)
+        else:
+            out(t) = out(t-1)"""
 
+    def __init__(self):
+        self.reg = Register()
+        self.value = Multi(zero for i in range(16)) # zero
+    def __call__(self, multi, load, increase, reset, clock):
+        # if load, inc, or reset are set, load should be set for the register
+        reg_load = load | increase | reset
+        # if inc = 1, return (value + 1), else return value
+        if_increase = multimux(self.value, inc(self.value), increase)
+        # if load = 1, return multi, else return if_increase
+        if_out = multimux(if_increase, multi, load)
+        # if reset = 1, return 0, else return if_out
+        if_reset = multimux(if_out, Multi(zero for i in range(16)), reset)
 
-
+        self.value = self.reg(if_reset, reg_load, clock)
+        return self.value
 

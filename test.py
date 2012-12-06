@@ -1,7 +1,7 @@
 from bit import Bit, nand, mux, dmux
 from multi import Multi, multimux, or_multiway, multimux_multiway, dmux_multiway, pad_to_digits, pad_multi
 from ALU import half_adder, full_adder, add_multi, inc, alu
-from sequential import SR, FF, DFF, SingleRegister, Register, RAM8, RAM64
+from sequential import SR, FF, DFF, SingleRegister, Register, RAM8, RAM64, PC
 
 import unittest
 
@@ -574,6 +574,34 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(ram(from_num(63), zero, thirteen6, zero)), str(from_num(13)))
         self.assertEquals(str(ram(from_num(63), one, sixtythree6, one)), str(zero16))
         self.assertEquals(str(ram(from_num(63), one, sixtythree6, zero)), str(from_num(63)))
+
+    def test_PC(self):
+        "pc(input, load, increase, reset, clock) -> Multi instance corresponding to control bits"
+
+        pc = PC()
+
+        self.assertEqual(str(pc(zero16, zero, zero, zero, one)), str(zero16))
+        self.assertEqual(str(pc(zero16, zero, zero, zero, zero)), str(zero16))
+        self.assertEqual(str(pc(zero16, zero, one, zero, one)), str(zero16))
+        self.assertEqual(str(pc(zero16, zero, one, zero, zero)), str(one16))
+        self.assertEqual(str(pc(neg_four, zero, one, zero, one)), str(one16))
+        self.assertEqual(str(pc(neg_four, zero, one, zero, zero)), str(two16))
+        self.assertEqual(str(pc(neg_four, one, one, zero, one)), str(two16))
+        self.assertEqual(str(pc(neg_four, one, one, zero, zero)), str(neg_four))
+        self.assertEqual(str(pc(neg_four, zero, one, zero, one)), str(neg_four))
+        self.assertEqual(str(pc(neg_four, zero, one, zero, zero)), str(neg_three))
+        self.assertEqual(str(pc(neg_four, zero, one, zero, one)), str(neg_three))
+        self.assertEqual(str(pc(neg_four, zero, one, zero, zero)), str(neg_two))
+        self.assertEqual(str(pc(eight16, one, zero, zero, one)), str(neg_two))
+        self.assertEqual(str(pc(eight16, one, zero, zero, zero)), str(eight16))
+        self.assertEqual(str(pc(eight16, one, zero, one, one)), str(eight16))
+        self.assertEqual(str(pc(eight16, one, zero, one, zero)), str(zero16))
+        self.assertEqual(str(pc(eight16, one, one, zero, one)), str(zero16))
+        self.assertEqual(str(pc(eight16, one, one, zero, zero)), str(eight16))
+        self.assertEqual(str(pc(eight16, one, one, one, one)), str(eight16))
+        self.assertEqual(str(pc(eight16, one, one, one, zero)), str(zero16))
+        self.assertEqual(str(pc(eight16, zero, one, zero, one)), str(zero16))
+        self.assertEqual(str(pc(eight16, zero, one, zero, zero)), str(one16))
 
 
 if __name__ == "__main__":
