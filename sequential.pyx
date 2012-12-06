@@ -5,7 +5,7 @@ from ALU import inc
 zero = Bit(0)
 one = Bit(1)
 
-cdef class SR:
+class SR:
     """Implements an SR gate(s, r) whereby:
         SR(0, 0) -> Q (hold pattern)
         SR(0, 1) -> 0 (reset)
