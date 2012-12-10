@@ -44,6 +44,7 @@ class Multi:
 
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
+
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] & pair[1]) for pair in zip(m1.value, m2.value))
 
