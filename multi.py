@@ -21,10 +21,10 @@ class Multi:
             yield bit
 
     def __eq__(self, mult):
-        return self.to_decimel() == mult.to_decimel()
+        return self.to_decimal() == mult.to_decimal()
 
     def __ne__(self, mult):
-        return self.to_decimel() != mult.to_decimel()
+        return self.to_decimal() != mult.to_decimal()
 
     def __getitem__(self, index):
         return self.value[index]
@@ -33,8 +33,8 @@ class Multi:
         self.value.insert(index, value)
 
     
-    def to_decimel(self):
-        """Converts a Multi instance to a decimel representation
+    def to_decimal(self):
+        """Converts a Multi instance to a decimal representation
             A Multi instance is negative if Multi[0] = 1 AND len(Multi) > 4"""
         if len(self) > 4 and int(self[0]) == 1:
             LSB_sum = sum((bit * 2**i) for i, bit in enumerate(reversed(self.value[1:])))
@@ -44,6 +44,7 @@ class Multi:
 
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
+
         m1, m2 = pad_multi(self, mult)
         return Multi((pair[0] & pair[1]) for pair in zip(m1.value, m2.value))
 
@@ -112,7 +113,7 @@ def pad_multi(mult1, mult2):
     shortest = Multi(min(mult1, mult2, key=len))
     diff = len(longest) - len(shortest)
     for i in range(diff):
-        if shortest.to_decimel() < 0:
+        if shortest.to_decimal() < 0:
             shortest.value.insert(0, Bit(1))
         else:
             shortest.value.insert(0, Bit(0))
