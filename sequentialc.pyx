@@ -14,9 +14,8 @@ class SR:
     self.q and self.nq are set to arbitrary numbers because all inputs will stabilize via the looping pattern"""
 
     cdef __init__(self):
-        cdef Bit self.q, self.nq
-        self.q = zero
-        self.nq = one
+        cdef Bit self.q = zero
+        cdef Bit self.nq = one
     cdef __call__(self, Bit s, Bit r):
         q1 = ~(r | self.nq)
         nq1 = ~(s | self.q)

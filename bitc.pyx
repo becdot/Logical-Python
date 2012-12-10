@@ -1,4 +1,4 @@
-class Bit:
+cpdef class Bit:
     """A single-bit class, where bit = 0 or 1
     Operators are overloaded and defined in terms of nand"""
 
