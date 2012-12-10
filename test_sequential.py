@@ -208,33 +208,33 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(ram(from_num(63), one, sixtythree6, one)), str(zero16))
         self.assertEquals(str(ram(from_num(63), one, sixtythree6, zero)), str(from_num(63)))
 
-    def test_RAM512(self):
-        "Takes a 9-bit address"
-        ram = RAM512()
+    # def test_RAM512(self):
+    #     "Takes a 9-bit address"
+    #     ram = RAM512()
 
 
-        self.assertEquals(str(ram(zero16, zero, zero9, one)), str(zero16))
-        self.assertEquals(str(ram(zero16, zero, zero9, zero)), str(zero16))
-        self.assertEquals(str(ram(zero16, one, zero9, one)), str(zero16))
-        self.assertEquals(str(ram(zero16, one, zero9, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), zero, zero9, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), zero, zero9, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), one, oneC_9, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), one, oneC_9, zero)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(100), zero, zero9, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(100), zero, zero9, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(300), zero, threeC, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(300), zero, threeC, zero)), str(zero16))
-        self.assertEquals(str(ram(from_num(300), one, threeC, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(300), one, threeC, zero)), str(from_num(300)))
-        self.assertEquals(str(ram(from_num(300), zero, threeC, one)), str(from_num(300)))
-        self.assertEquals(str(ram(from_num(300), zero, threeC, zero)), str(from_num(300)))
-        self.assertEquals(str(ram(from_num(300), zero, threeC, one)), str(from_num(300)))
-        self.assertEquals(str(ram(from_num(300), zero, oneC_9, zero)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(500), zero, oneC_9, one)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(500), zero, oneC_9, zero)), str(from_num(100)))
-        self.assertEquals(str(ram(from_num(500), one, fiveC, one)), str(zero16))
-        self.assertEquals(str(ram(from_num(500), one, fiveC, zero)), str(from_num(500)))
+    #     self.assertEquals(str(ram(zero16, zero, zero9, one)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, zero, zero9, zero)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, one, zero9, one)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, one, zero9, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero9, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero9, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), one, oneC_9, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), one, oneC_9, zero)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero9, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(100), zero, zero9, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(300), zero, threeC, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(300), zero, threeC, zero)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(300), one, threeC, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(300), one, threeC, zero)), str(from_num(300)))
+    #     self.assertEquals(str(ram(from_num(300), zero, threeC, one)), str(from_num(300)))
+    #     self.assertEquals(str(ram(from_num(300), zero, threeC, zero)), str(from_num(300)))
+    #     self.assertEquals(str(ram(from_num(300), zero, threeC, one)), str(from_num(300)))
+    #     self.assertEquals(str(ram(from_num(300), zero, oneC_9, zero)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(500), zero, oneC_9, one)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(500), zero, oneC_9, zero)), str(from_num(100)))
+    #     self.assertEquals(str(ram(from_num(500), one, fiveC, one)), str(zero16))
+    #     self.assertEquals(str(ram(from_num(500), one, fiveC, zero)), str(from_num(500)))
 
     # RATHER SLOW
     # def test_RAM4K(self):
@@ -265,7 +265,7 @@ class TestLogic(unittest.TestCase):
     #     self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, one)), str(zero16))
     #     self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, zero)), str(from_num(4095)))
 
-    # INCREDIBLY SLOW, be careful in uncommenting!
+    # # INCREDIBLY SLOW, be careful in uncommenting!
     # def test_RAM16K(self):
     #     "Takes a 14-bit address"
     #     ram = RAM16K()
@@ -323,4 +323,4 @@ class TestLogic(unittest.TestCase):
         self.assertEqual(str(pc(eight16, zero, one, zero, zero)), str(one16))
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(module='test_sequential')

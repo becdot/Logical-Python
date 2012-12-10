@@ -1,0 +1,25 @@
+         4899502 function calls (4892861 primitive calls) in 6.226 seconds
+
+   Ordered by: call count
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  1570192    1.459    0.000    1.459    0.000 bit.py:5(__init__)
+  1566558    1.596    0.000    3.050    0.000 bit.py:43(nand)
+   870816    0.410    0.000    2.113    0.000 bit.py:28(__invert__)
+   261348    0.525    0.000    2.296    0.000 bit.py:32(__or__)
+   215866    0.183    0.000    1.026    0.000 bit.py:23(__and__)
+    64020    0.013    0.000    0.013    0.000 multi.py:19(__iter__)
+    51531    0.692    0.000    2.969    0.000 sequential.py:19(__call__)
+    51524    0.397    0.000    3.978    0.000 sequential.py:36(__call__)
+    51220    0.450    0.000    1.535    0.000 bit.py:47(mux)
+    27336    0.048    0.000    5.019    0.000 sequential.py:73(<genexpr>)
+    27064    0.025    0.000    0.782    0.000 multi.py:62(<genexpr>)
+    25758    0.098    0.000    4.138    0.000 sequential.py:47(__call__)
+    25748    0.061    0.000    4.974    0.000 sequential.py:60(__call__)
+19086/13772    0.006    0.000    0.009    0.000 {len}
+     7682    0.017    0.000    0.021    0.000 multi.py:43(<genexpr>)
+     7114    0.004    0.000    0.005    0.000 multi.py:13(__len__)
+     6991    0.004    0.000    0.004    0.000 bit.py:16(__mul__)
+     5891    0.042    0.000    5.855    0.001 multi.py:9(__init__)
+     4191    0.002    0.000    0.002    0.000 multi.py:29(__getitem__)
+     3418    0.017    0.000    0.024    0.000 {zip}
