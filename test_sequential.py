@@ -268,7 +268,7 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, one)), str(zero16))
         self.assertEquals(str(ram(from_num(4095), one, fortynintyfive, zero)), str(from_num(4095)))
 
-    # INCREDIBLY SLOW, be careful in uncommenting!
+    # # INCREDIBLY SLOW, be careful in uncommenting!
     # def test_RAM16K(self):
     #     "Takes a 14-bit address"
     #     ram = RAM16K()
@@ -326,4 +326,4 @@ class TestLogic(unittest.TestCase):
     #     self.assertEqual(str(pc(eight16, zero, one, zero, zero)), str(one16))
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(module='test_sequential')

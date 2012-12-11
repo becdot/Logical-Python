@@ -1,0 +1,25 @@
+         4899502 function calls (4892861 primitive calls) in 6.211 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    6.192    6.192 main.py:72(__init__)
+        1    0.000    0.000    6.189    6.189 main.py:213(runTests)
+        1    0.000    0.000    6.189    6.189 runner.py:140(run)
+      2/1    0.000    0.000    6.189    6.189 suite.py:69(__call__)
+      2/1    0.000    0.000    6.189    6.189 suite.py:88(run)
+        8    0.000    0.000    6.189    0.774 case.py:390(__call__)
+        8    0.006    0.001    6.189    0.774 case.py:293(run)
+     5891    0.043    0.000    5.846    0.001 multi.py:9(__init__)
+      196    0.008    0.000    5.691    0.029 sequential.py:97(__call__)
+        1    0.001    0.001    5.237    5.237 test_sequential.py:184(test_RAM64)
+       22    0.003    0.000    5.203    0.236 sequential.py:86(__call__)
+     1608    0.005    0.000    5.039    0.003 sequential.py:72(__call__)
+    27336    0.048    0.000    4.999    0.000 sequential.py:73(<genexpr>)
+    25748    0.062    0.000    4.955    0.000 sequential.py:60(__call__)
+    25758    0.097    0.000    4.120    0.000 sequential.py:47(__call__)
+    51524    0.390    0.000    3.962    0.000 sequential.py:36(__call__)
+  1566558    1.586    0.000    3.045    0.000 bit.py:43(nand)
+    51531    0.693    0.000    2.964    0.000 sequential.py:19(__call__)
+   261348    0.521    0.000    2.288    0.000 bit.py:32(__or__)
+   870816    0.406    0.000    2.110    0.000 bit.py:28(__invert__)

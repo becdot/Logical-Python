@@ -1,11 +1,12 @@
-cpdef class Bit:
+cdef class Bit:
     """A single-bit class, where bit = 0 or 1
     Operators are overloaded and defined in terms of nand"""
 
-    def __init__(self, int value):
+    cdef public int value
+
+    def __init__(self, val):
         "Initialise Bit with a value or either 1 or 0"
-        assert int(value) in [0, 1], "Bit must be either a 1 or 0!"
-        self.value = int(value)
+        self.value = int(val)
 
     def __repr__(self):
         return str(self.value)
@@ -39,14 +40,16 @@ cpdef class Bit:
         last = ~(num1 & ~self)
         return nand(first, last)
 
+one = Bit(1)
+zero = Bit(0)
 
 def nand(Bit bit1, Bit bit2):
     "nand = not(a and b), operating on two instances of bit.Bit"
-    cdef int b1, b2
-    b1, b2 = bit1.value, bit2.value
-    return Bit(not(b1 and b2))
+    cdef int val1, val2
+    val1, val2 = bit1.value, bit2.value
+    return zero if (val1 and val2) else one
 
-def mux(Bit bit1, Bit bit2, Bit sel):
+def mux(Bit bit1, Bit bit2, sel):
     "If sel = 0, returns a; if sel = 1, returns b"
     return (bit1 & ~sel) | (bit2 & sel)
 
