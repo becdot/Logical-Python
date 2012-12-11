@@ -120,16 +120,16 @@ class TestLogic(unittest.TestCase):
         self.assertTrue(m_three == three16)
         self.assertTrue(m_three == Multi([one, one]))
       
-    def test_Multi_to_decimel(self):
-        "Binary -> decimel for both positive and negative numbers"
-        self.assertEquals(Multi.to_decimel(m_fifteen), 15)
-        self.assertEquals(Multi.to_decimel(m_eight), 8)
-        self.assertEquals(Multi.to_decimel(m_one), 1)
-        self.assertEquals(Multi.to_decimel(m_zero), 0)
-        self.assertEquals(Multi.to_decimel(neg_one), -1)
-        self.assertEquals(Multi.to_decimel(neg_two), -2)
-        self.assertEquals(Multi.to_decimel(neg_three), -3)
-        self.assertEquals(Multi.to_decimel(neg_four), -4)
+    def test_Multi_to_decimal(self):
+        "Binary -> decimal for both positive and negative numbers"
+        self.assertEquals(Multi.to_decimal(m_fifteen), 15)
+        self.assertEquals(Multi.to_decimal(m_eight), 8)
+        self.assertEquals(Multi.to_decimal(m_one), 1)
+        self.assertEquals(Multi.to_decimal(m_zero), 0)
+        self.assertEquals(Multi.to_decimal(neg_one), -1)
+        self.assertEquals(Multi.to_decimal(neg_two), -2)
+        self.assertEquals(Multi.to_decimal(neg_three), -3)
+        self.assertEquals(Multi.to_decimal(neg_four), -4)
 
     def test_Multi_pad(self):
         """Checks that positive and negative Multi instances of uneven length are padded appropriately.
