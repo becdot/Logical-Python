@@ -1,23 +1,23 @@
-from bit import Bit, mux
+from bit import Bit, mux, nand
 from multi import Multi, multimux, dmux_multiway, multimux_multiway
 from ALU import inc
 
 class SR(object):
     """Implements an SR gate(s, r) whereby:
-        SR(0, 0) -> Q (hold pattern)
+        SR(0, 0) -> not allowed
         SR(0, 1) -> 0 (reset)
         SR(1, 0) -> 1 (set)
-        SR(1, 1) -> not allowed
+        SR(1, 1) -> Q (hold pattern)
     self.q and self.nq are set to arbitrary numbers because all inputs will stabilize via the looping pattern"""
 
     def __init__(self):
         self.q = Bit.zero
         self.nq = Bit.one
     def __call__(self, s, r):
-        q1 = ~(r | self.nq)
-        nq1 = ~(s | self.q)
-        self.q = ~(r | nq1)
-        self.nq = ~(s | q1)
+        q1 = nand(r, self.nq)
+        nq1 = nand(s, self.q)
+        self.q = nand(r, nq1)
+        self.nq = nand(s, q1)
         return self.q
 
 class FF(object):
@@ -26,13 +26,13 @@ class FF(object):
         FF(0, 1) -> 0 (reset)
         FF(1, 0) -> Q (hold)
         FF(1, 1) -> 1 (set)
-    It is also implemented in such a way that the SR gate can never be called with the disallowed (1, 1) input"""
+    It is also implemented in such a way that the SR gate can never be called with the disallowed (0, 0) input"""
 
     def __init__(self):
         self.sr = SR()
     def __call__(self, data, clock):
-        r = clock & ~data
-        s = clock & data
+        r = nand(clock, data)
+        s = nand(clock, r)
         return self.sr(s, r)
 
 class DFF(object):
