@@ -3,7 +3,7 @@ from bit import Bit, dmux, mux
 import math
 
 
-class Multi:
+class Multi(object):
     "A class composed of one or more Bits"
 
     def __init__(self, bit_list):

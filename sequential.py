@@ -5,7 +5,7 @@ from ALU import inc
 zero = Bit(0)
 one = Bit(1)
 
-class SR:
+class SR(object):
     """Implements an SR gate(s, r) whereby:
         SR(0, 0) -> Q (hold pattern)
         SR(0, 1) -> 0 (reset)
@@ -23,7 +23,7 @@ class SR:
         self.nq = ~(s | q1)
         return self.q
 
-class FF:
+class FF(object):
     """Implements a flip flop whereby:
         FF(0, 0) -> Q (hold)
         FF(0, 1) -> 0 (reset)
@@ -38,7 +38,7 @@ class FF:
         s = clock & data
         return self.sr(s, r)
 
-class DFF:
+class DFF(object):
     """Implements a DFF gate where the slave -> master output of previous cycle
         Change occurs on the FALLING edge of the clock (i.e. 1 -> 0)"""
     def __init__(self):
@@ -49,7 +49,7 @@ class DFF:
         slave_q = self.slave(master_q, ~clock)
         return slave_q
 
-class SingleRegister:
+class SingleRegister(object):
     """if load(t) = 1, out(t + 1) = in(t)
         if load(t) = 0, out(t + 1) = out(t) (no change)
         returns a single bit on the falling edge of the clock"""
@@ -62,7 +62,7 @@ class SingleRegister:
         self.value = self.dff(initial_mux, clock)
         return self.value
 
-class Register:
+class Register(object):
     """if load(t) = 1, out(t + 1) = in(t)
         if load(t) = 0, out(t + 1) = out(t) (no change)
         returns a Multibit instance on the falling edge of the clock"""
@@ -73,7 +73,7 @@ class Register:
         return Multi(pair[0](pair[1], load, clock) for pair in zip(self.reg, multi))
 
 
-class RAM:
+class RAM(object):
     "Sets up the basic rules for a RAM block, that can be called with the name of a RAM type to build from (e.g. RAM64 -> RAM8)"
 
     make_from = None
@@ -122,7 +122,7 @@ class RAM16K(RAM):
         return multimux_multiway(input_address, *regs)
 
 
-class PC:
+class PC(object):
     """ if reset(t-1):
             out(t) = 0
         elif load(t-1):
