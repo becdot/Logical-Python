@@ -1,3 +1,5 @@
+# Used nand with SR and FF classes instead of nor
+
          484985863 function calls (483125073 primitive calls) in 55.276 seconds
 
    Ordered by: internal time
