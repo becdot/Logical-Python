@@ -2,9 +2,6 @@ from bit import Bit, mux
 from multi import Multi, multimux, dmux_multiway, multimux_multiway
 from ALU import inc
 
-zero = Bit(0)
-one = Bit(1)
-
 class SR(object):
     """Implements an SR gate(s, r) whereby:
         SR(0, 0) -> Q (hold pattern)
@@ -14,8 +11,8 @@ class SR(object):
     self.q and self.nq are set to arbitrary numbers because all inputs will stabilize via the looping pattern"""
 
     def __init__(self):
-        self.q = zero
-        self.nq = one
+        self.q = Bit.zero
+        self.nq = Bit.one
     def __call__(self, s, r):
         q1 = ~(r | self.nq)
         nq1 = ~(s | self.q)
@@ -56,7 +53,7 @@ class SingleRegister(object):
 
     def __init__(self):
         self.dff = DFF()
-        self.value = zero
+        self.value = Bit.zero
     def __call__(self, bit, load, clock):
         initial_mux = mux(self.value, bit, load)
         self.value = self.dff(initial_mux, clock)
@@ -134,7 +131,7 @@ class PC(object):
 
     def __init__(self):
         self.reg = Register()
-        self.value = Multi(zero for i in range(16)) # zero
+        self.value = Multi(Bit.zero for i in range(16)) # zero
     def __call__(self, multi, load, increase, reset, clock):
         # if load, inc, or reset are set, load should be set for the register
         reg_load = load | increase | reset
@@ -143,7 +140,7 @@ class PC(object):
         # if load = 1, return multi, else return if_increase
         if_out = multimux(if_increase, multi, load)
         # if reset = 1, return 0, else return if_out
-        if_reset = multimux(if_out, Multi(zero for i in range(16)), reset)
+        if_reset = multimux(if_out, Multi(Bit.zero for i in range(16)), reset)
 
         self.value = self.reg(if_reset, reg_load, clock)
         return self.value
