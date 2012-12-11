@@ -1,4 +1,4 @@
-from bit import Bit, mux
+from bit import Bit, mux, nand
 from multi import Multi, multimux, dmux_multiway, multimux_multiway
 from ALU import inc
 
@@ -14,10 +14,10 @@ class SR(object):
         self.q = Bit.zero
         self.nq = Bit.one
     def __call__(self, s, r):
-        q1 = ~(r | self.nq)
-        nq1 = ~(s | self.q)
-        self.q = ~(r | nq1)
-        self.nq = ~(s | q1)
+        q1 = nand(r, self.nq)
+        nq1 = nand(s, self.q)
+        self.q = nand(r, nq1)
+        self.nq = nand(s, q1)
         return self.q
 
 class FF(object):
@@ -31,8 +31,8 @@ class FF(object):
     def __init__(self):
         self.sr = SR()
     def __call__(self, data, clock):
-        r = clock & ~data
-        s = clock & data
+        r = nand(clock, data)
+        s = nand(clock, r)
         return self.sr(s, r)
 
 class DFF(object):

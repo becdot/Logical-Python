@@ -68,13 +68,13 @@ class TestLogic(unittest.TestCase):
         SR(1, 1) -> not allowed"""
 
         sr = SR()
-        self.assertFalse(sr(zero, zero))
+        self.assertFalse(sr(one, one))
         self.assertFalse(sr(zero, one))
         self.assertTrue(sr(one, zero))
-        self.assertTrue(sr(zero, zero))
-        self.assertTrue(sr(zero, zero))
+        self.assertTrue(sr(one, one))
+        self.assertTrue(sr(one, one))
         self.assertFalse(sr(zero, one))
-        self.assertFalse(sr(zero, zero))
+        self.assertFalse(sr(one, one))
 
     def test_FF(self):
         """FF(0, 0) -> Q (hold)
