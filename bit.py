@@ -55,7 +55,9 @@ def nand(bit1, bit2):
 
 def mux(bit1, bit2, sel):
     "If sel = 0, returns a; if sel = 1, returns b"
-    return (bit1 & ~sel) | (bit2 & sel)
+    if (bit1 & ~sel):
+        return bit1
+    return (bit2 & sel)
 
 def dmux(bit, sel):
     "If sel = 0, returns [a=bit, b=0]; if sel = 1, returns [a=0, b=bit]"
