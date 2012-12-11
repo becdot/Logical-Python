@@ -133,4 +133,4 @@ def pad_to_digits(digits, *mult):
         else:
             pad_m = pad_multi(compare, Multi(m))[1]
             padded.append(pad_m)
-    return padded
+            return padded
