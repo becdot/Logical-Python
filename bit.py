@@ -1,14 +1,7 @@
-class Bit(object):
+class Bit:
     """A single-bit class, where bit = 0 or 1
     Operators are overloaded and defined in terms of nand"""
-    one = None
-    zero = None
 
-    def __new__(cls, value):
-        if int(value):
-            return Bit.one
-        return Bit.zero  
-            
     def __init__(self, value):
         "Initialise Bit with a value or either 1 or 0"
         assert int(value) in [0, 1], "Bit must be either a 1 or 0!"
@@ -46,12 +39,10 @@ class Bit(object):
         last = ~(num1 & ~self)
         return nand(first, last)
 
-Bit.one = object.__new__(Bit, 1)
-Bit.zero = object.__new__(Bit, 0)
 
 def nand(bit1, bit2):
     "nand = not(a and b), operating on two instances of bit.Bit"
-    return Bit.zero if (bit1.value and bit2.value) else Bit.one
+    return Bit(not(bit1.value and bit2.value))
 
 def mux(bit1, bit2, sel):
     "If sel = 0, returns a; if sel = 1, returns b"
