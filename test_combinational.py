@@ -209,6 +209,7 @@ class TestLogic(unittest.TestCase):
         two4 = Multi([zero, zero, one, zero])
         
         self.assertEquals(str(m_eight & m_zero), str(zero4))
+        self.assertEquals(str(m_eight & m_zero), str(zero4))
         self.assertEquals(str(m_eight & m_one), str(zero4))
         self.assertEquals(str(m_eight & m_fifteen), str(m_eight))
         self.assertEquals(str(m_three & m_fourteen), str(two4))

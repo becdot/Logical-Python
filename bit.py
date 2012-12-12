@@ -1,3 +1,15 @@
+def cache(func):
+    d = {}
+    def _cache(self, bit1):
+        val = (self.value, bit1.value)
+        try:
+            return d[val]
+        except KeyError:
+            result = func(self, bit1)
+            d[val] = result
+            return result
+    return _cache
+
 class Bit(object):
     """A single-bit class, where bit = 0 or 1
     Operators are overloaded and defined in terms of nand"""
@@ -27,19 +39,23 @@ class Bit(object):
         "Enables truth comparison of Bit instances"
         return self.value
 
+    # @cache
     def __and__(self, num1):
         "Overloads the & operator using the nand function"
         a = nand(self, num1)
         return nand(a, a)
 
+    # @cache
     def __invert__(self):
         "Overloads ~ to return logical not of a bit, instead of bitwise not"
         return nand(self, self)
 
+    # @cache
     def __or__(self, num1):
         "Overloads the | operator using the nand function"
         return nand(~self, ~num1)
 
+    # @cache
     def __xor__(self, num1):
         "Overloads the ^ operator using the nand function"
         first = ~(self & ~num1)
@@ -53,12 +69,14 @@ def nand(bit1, bit2):
     "nand = not(a and b), operating on two instances of bit.Bit"
     return Bit.zero if (bit1.value and bit2.value) else Bit.one
 
+# @cache
 def mux(bit1, bit2, sel):
     "If sel = 0, returns a; if sel = 1, returns b"
     if (bit1 & ~sel):
         return bit1
     return (bit2 & sel)
 
+# @cache
 def dmux(bit, sel):
     "If sel = 0, returns [a=bit, b=0]; if sel = 1, returns [a=0, b=bit]"
     return [(bit & ~sel), (bit & sel)]
