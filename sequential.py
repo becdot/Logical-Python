@@ -2,30 +2,6 @@ from bit import Bit, mux, nand
 from multi import Multi, multimux, dmux_multiway, multimux_multiway
 from ALU import inc
 
-def cache3(func):
-    d = {}
-    def _cache(self, bit1, bit2):
-        val = (bit1.value, bit2.value)
-        try:
-            return d[val]
-        except KeyError:
-            result = func(self, bit1, bit2)
-            d[val] = result
-            return result
-    return _cache
-
-def cache4(func):
-    d = {}
-    def _cache(self, bit1, bit2, bit3):
-        val = (bit1.value, bit2.value, bit3.value)
-        try:
-            return d[val]
-        except KeyError:
-            result = func(self, bit1, bit2, bit3)
-            d[val] = result
-            return result
-    return _cache
-
 class SR(object):
     """Implements an SR gate(s, r) whereby:
         SR(0, 0) -> not allowed

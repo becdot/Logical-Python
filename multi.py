@@ -2,23 +2,8 @@ from bit import Bit, dmux, mux
 
 import math
 
-# def cache(func):
-#     d = {}
-#     def _cache(self, bit):
-
-#         try:
-#             return d[obj]
-#         except KeyError:
-#             print "{} has not been created".format(func)
-#             result = func(*obj)
-#             d[obj] = result
-#             return result
-#     return _cache
-
 class Multi(object):
     "A class composed of one or more Bits"
-
-    MULTIS = {}   
 
     def __init__(self, bit_list):
         "Multi is a list of Bits"
@@ -55,7 +40,6 @@ class Multi(object):
             return MSB + LSB_sum
         return sum((bit * 2**i) for i, bit in enumerate(reversed(self.value)))
 
-    # @cache
     def __and__(self, mult):
         "Overloads the & operator so out[0] = (a[0] & b[0]), etc..."
 
