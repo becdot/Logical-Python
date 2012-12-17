@@ -274,32 +274,32 @@ class TestLogic(unittest.TestCase):
         self.assertEquals(str(ram(fortynintyfive16, one, fortynintyfive, zero)), str(fortynintyfive16))
 
     # # INCREDIBLY SLOW, be careful in uncommenting!
-    def test_RAM16K(self):
-        "Takes a 14-bit address"
-        ram = RAM16K()
+    # def test_RAM16K(self):
+    #     "Takes a 14-bit address"
+    #     ram = RAM16K()
 
-        self.assertEquals(str(ram(zero16, zero, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(zero16, zero, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(zero16, one, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(zero16, one, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(oneC16, zero, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(oneC16, zero, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(oneC16, one, oneC_14, one)), str(zero16))
-        self.assertEquals(str(ram(oneC16, one, oneC_14, zero)), str(oneC16))
-        self.assertEquals(str(ram(oneC16, zero, zero6, one)), str(zero16))
-        self.assertEquals(str(ram(oneC16, zero, zero6, zero)), str(zero16))
-        self.assertEquals(str(ram(threeK16, zero, threeK_14, one)), str(zero16))
-        self.assertEquals(str(ram(threeK16, zero, threeK_14, zero)), str(zero16))
-        self.assertEquals(str(ram(threeK16, one, threeK_14, one)), str(zero16))
-        self.assertEquals(str(ram(threeK16, one, threeK_14, zero)), str(threeK16))
-        self.assertEquals(str(ram(threeK16, zero, threeK_14, one)), str(threeK16))
-        self.assertEquals(str(ram(threeK16, zero, threeK_14, zero)), str(threeK16))
-        self.assertEquals(str(ram(threeK16, zero, threeK_14, one)), str(threeK16))
-        self.assertEquals(str(ram(threeK16, zero, oneC_14, zero)), str(oneC16))
-        self.assertEquals(str(ram(sixteenthreeeightythree16, zero, oneC_14, one)), str(oneC16))
-        self.assertEquals(str(ram(sixteenthreeeightythree16, zero, oneC_14, zero)), str(oneC16))
-        self.assertEquals(str(ram(sixteenthreeeightythree16, one, sixteenthreeeightythree, one)), str(zero16))
-        self.assertEquals(str(ram(sixteenthreeeightythree16, one, sixteenthreeeightythree, zero)), str(sixteenthreeeightythree16))
+    #     self.assertEquals(str(ram(zero16, zero, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, zero, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, one, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(zero16, one, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(oneC16, zero, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(oneC16, zero, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(oneC16, one, oneC_14, one)), str(zero16))
+    #     self.assertEquals(str(ram(oneC16, one, oneC_14, zero)), str(oneC16))
+    #     self.assertEquals(str(ram(oneC16, zero, zero6, one)), str(zero16))
+    #     self.assertEquals(str(ram(oneC16, zero, zero6, zero)), str(zero16))
+    #     self.assertEquals(str(ram(threeK16, zero, threeK_14, one)), str(zero16))
+    #     self.assertEquals(str(ram(threeK16, zero, threeK_14, zero)), str(zero16))
+    #     self.assertEquals(str(ram(threeK16, one, threeK_14, one)), str(zero16))
+    #     self.assertEquals(str(ram(threeK16, one, threeK_14, zero)), str(threeK16))
+    #     self.assertEquals(str(ram(threeK16, zero, threeK_14, one)), str(threeK16))
+    #     self.assertEquals(str(ram(threeK16, zero, threeK_14, zero)), str(threeK16))
+    #     self.assertEquals(str(ram(threeK16, zero, threeK_14, one)), str(threeK16))
+    #     self.assertEquals(str(ram(threeK16, zero, oneC_14, zero)), str(oneC16))
+    #     self.assertEquals(str(ram(sixteenthreeeightythree16, zero, oneC_14, one)), str(oneC16))
+    #     self.assertEquals(str(ram(sixteenthreeeightythree16, zero, oneC_14, zero)), str(oneC16))
+    #     self.assertEquals(str(ram(sixteenthreeeightythree16, one, sixteenthreeeightythree, one)), str(zero16))
+    #     self.assertEquals(str(ram(sixteenthreeeightythree16, one, sixteenthreeeightythree, zero)), str(sixteenthreeeightythree16))
 
 
     def test_PC(self):

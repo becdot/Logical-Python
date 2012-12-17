@@ -67,7 +67,7 @@ class Register(object):
     def __init__(self):
         self.reg = [SingleRegister() for i in range(16)]
     def __call__(self, multi, load, clock):
-        return Multi(pair[0](pair[1], load, clock) for pair in zip(self.reg, multi))
+        return Multi(single_reg(bit, load, clock) for single_reg, bit in zip(self.reg, multi))
 
 
 class RAM(object):
@@ -84,7 +84,7 @@ class RAM(object):
         input_address = Multi(address[-1:-4:-1])
         reg_address = Multi(address[-4:-(len(address) + 1):-1])
         inputs = dmux_multiway(Multi([load]), input_address)
-        regs = [Multi(pair[0](multi, pair[1], reg_address, clock)) for pair in zip(self.reg, inputs)]        
+        regs = [Multi(reg(multi, set_load, reg_address, clock)) for reg, set_load in zip(self.reg, inputs)]        
         return multimux_multiway(input_address, *regs)
 
 class RAM8(RAM):
@@ -93,7 +93,7 @@ class RAM8(RAM):
 
     def __call__(self, multi, load, address, clock):
         inputs = dmux_multiway(Multi([load]), address)
-        regs = [Multi(pair[0](multi, pair[1], clock)) for pair in zip(self.reg, inputs)]
+        regs = [Multi(reg(multi, set_load, clock)) for reg, set_load in zip(self.reg, inputs)]
         return multimux_multiway(address, *regs)        
 
 class RAM64(RAM):
@@ -115,7 +115,7 @@ class RAM16K(RAM):
         input_address = Multi(address[-1:-4:-1])
         reg_address = Multi(address[-3:-(len(address) + 1):-1])
         inputs = dmux_multiway(Multi([load]), input_address)
-        regs = [Multi(pair[0](multi, pair[1], reg_address, clock)) for pair in zip(self.reg, inputs)]        
+        regs = [Multi(reg(multi, set_load, reg_address, clock)) for reg, set_load in zip(self.reg, inputs)]        
         return multimux_multiway(input_address, *regs)
 
 
@@ -144,4 +144,3 @@ class PC(object):
 
         self.value = self.reg(if_reset, reg_load, clock)
         return self.value
-

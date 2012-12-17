@@ -38,6 +38,7 @@ class Bit(object):
 
     def __or__(self, num1):
         "Overloads the | operator using the nand function"
+        # nand(nand(self, self), nand(num1, num1))
         return nand(~self, ~num1)
 
     def __xor__(self, num1):
